@@ -1,12 +1,20 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import './Layout.css';
 
 const Layout = ({ children }) => {
   const { user, logout } = useAuth();
+  const navigate = useNavigate();
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    try {
+      await logout();
+      // Explicitly navigate to landing page after logout
+      navigate('/', { replace: true });
+    } catch (error) {
+      // Even if logout fails, redirect to landing page
+      navigate('/', { replace: true });
+    }
   };
 
   return (
