@@ -1,0 +1,444 @@
+/* Friendship-Themed Design System - Warm & Nostalgic */
+
+:root {
+  /* Custom Color Palette - Warm & Sophisticated */
+  --color-primary: #faa916;        /* Warm golden orange - energy & warmth */
+  --color-primary-light: #fbb547;  /* Lighter golden orange */
+  --color-primary-dark: #e8970e;   /* Deeper golden orange */
+  
+  --color-secondary: #96031a;      /* Deep burgundy - passion & depth */
+  --color-secondary-light: #b8253a; /* Lighter burgundy */
+  --color-secondary-dark: #7a0215; /* Deeper burgundy */
+  
+  --color-accent: #6d676e;         /* Muted purple-gray - sophistication */
+  --color-accent-light: #8a8490;   /* Lighter purple-gray */
+  --color-accent-dark: #524d54;    /* Deeper purple-gray */
+  
+  --color-tertiary: #1b1b1e;       /* Deep charcoal - elegance & depth */
+  
+  /* Elegant Neutral Backgrounds */
+  --color-background: #fbfffe;     /* Pure cream-white - clean & fresh */
+  --color-surface: #f8f7f8;        /* Very light warm gray */
+  --color-surface-elevated: #ffffff; /* Pure white for cards */
+  --color-surface-warm: #faf9fa;   /* Slightly warmer surface tone */
+  
+  /* Sophisticated Text Colors */
+  --color-text-primary: #1b1b1e;   /* Deep charcoal - strong & elegant */
+  --color-text-secondary: #6d676e; /* Muted purple-gray - sophisticated */
+  --color-text-muted: #8a8490;     /* Light purple-gray */
+  --color-text-light: #b5b1b6;     /* Very light gray */
+  --color-text-warm: #524d54;      /* Warm charcoal */
+  
+  /* Emotional State Colors */
+  --color-success: #4a9960;        /* Fresh green - achievement */
+  --color-warning: #faa916;        /* Golden orange - attention */
+  --color-error: #96031a;          /* Deep burgundy - error */
+  --color-info: #6d676e;           /* Purple-gray - information */
+  
+  /* Elegant Shadows & Effects */
+  --shadow-soft: 0 2px 12px rgba(27, 27, 30, 0.08);
+  --shadow-medium: 0 4px 20px rgba(27, 27, 30, 0.12);
+  --shadow-strong: 0 8px 32px rgba(27, 27, 30, 0.16);
+  --shadow-warm: 0 4px 16px rgba(250, 169, 22, 0.15);
+  --shadow-memory: 0 6px 24px rgba(109, 103, 110, 0.12);
+  
+  /* Friendly Border Radius - Memory Album Feel */
+  --radius-small: 12px;
+  --radius-medium: 16px;
+  --radius-large: 20px;
+  --radius-xl: 28px;
+  --radius-cozy: 24px;
+  
+  /* Spacing Scale */
+  --space-xs: 0.25rem;   /* 4px */
+  --space-sm: 0.5rem;    /* 8px */
+  --space-md: 1rem;      /* 16px */
+  --space-lg: 1.5rem;    /* 24px */
+  --space-xl: 2rem;      /* 32px */
+  --space-2xl: 3rem;     /* 48px */
+  --space-3xl: 4rem;     /* 64px */
+  
+  /* Typography */
+  --font-family-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-family-display: 'Louisville Script W07 Bold It', 'Louisville Script Bold', cursive, serif;
+  --font-family-accent: 'Poppins', 'Inter', sans-serif;
+  --font-family-script: 'Louisville Script W07 Bold It', 'Louisville Script Bold', cursive;
+  
+  --font-size-xs: 0.75rem;    /* 12px */
+  --font-size-sm: 0.875rem;   /* 14px */
+  --font-size-base: 1rem;     /* 16px */
+  --font-size-lg: 1.125rem;   /* 18px */
+  --font-size-xl: 1.25rem;    /* 20px */
+  --font-size-2xl: 1.5rem;    /* 24px */
+  --font-size-3xl: 1.875rem;  /* 30px */
+  --font-size-4xl: 2.25rem;   /* 36px */
+  
+  --font-weight-light: 300;
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  
+  --line-height-tight: 1.2;
+  --line-height-normal: 1.4;
+  --line-height-relaxed: 1.6;
+}
+
+/* Reset & Base Styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-family-script);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-normal);
+  line-height: var(--line-height-normal);
+  color: var(--color-text-primary);
+  background-color: var(--color-background);
+  background-image: 
+    radial-gradient(circle at 20% 80%, rgba(250, 169, 22, 0.03) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(150, 3, 26, 0.03) 0%, transparent 50%);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Text Selection */
+::selection {
+  background-color: rgba(250, 169, 22, 0.2);
+  color: var(--color-text-primary);
+}
+
+::-moz-selection {
+  background-color: rgba(250, 169, 22, 0.2);
+  color: var(--color-text-primary);
+}
+
+/* Typography */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-family-script);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-tight);
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-md);
+  text-shadow: 0 1px 2px rgba(27, 27, 30, 0.1);
+}
+
+h1 { font-size: var(--font-size-4xl); }
+h2 { font-size: var(--font-size-3xl); }
+h3 { font-size: var(--font-size-2xl); }
+h4 { font-size: var(--font-size-xl); }
+h5 { font-size: var(--font-size-lg); }
+h6 { font-size: var(--font-size-base); }
+
+p {
+  font-family: var(--font-family-primary);
+  margin-bottom: var(--space-md);
+  color: var(--color-text-secondary);
+  line-height: var(--line-height-relaxed);
+}
+
+/* Form Elements */
+.form-group {
+  margin-bottom: var(--space-lg);
+}
+
+.form-label {
+  display: block;
+  font-family: var(--font-family-script);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-sm);
+  letter-spacing: 0.025em;
+}
+
+.form-input {
+  width: 100%;
+  padding: var(--space-md) var(--space-lg);
+  font-size: var(--font-size-base);
+  font-family: var(--font-family-primary);
+  color: var(--color-text-primary);
+  background-color: var(--color-surface-elevated);
+  border: 2px solid transparent;
+  border-radius: var(--radius-medium);
+  transition: all 0.3s ease;
+  outline: none;
+  box-shadow: var(--shadow-soft);
+}
+
+.form-input:focus {
+  border-color: var(--color-primary);
+  background-color: var(--color-surface-elevated);
+  box-shadow: 0 0 0 4px rgba(250, 169, 22, 0.15), var(--shadow-medium);
+  transform: translateY(-1px) scale(1.01);
+}
+
+.form-input::placeholder {
+  color: var(--color-text-muted);
+}
+
+/* Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-md) var(--space-xl);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  font-family: var(--font-family-script);
+  text-decoration: none;
+  border: none;
+  border-radius: var(--radius-large);
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  outline: none;
+  letter-spacing: 0.05em;
+  box-shadow: var(--shadow-soft);
+  position: relative;
+  overflow: hidden;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
+}
+
+.btn:hover::before {
+  left: 100%;
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+  color: white;
+  box-shadow: var(--shadow-medium);
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: linear-gradient(135deg, var(--color-primary-dark) 0%, var(--color-primary) 100%);
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: var(--shadow-strong);
+}
+
+.btn-secondary {
+  background-color: var(--color-surface-elevated);
+  color: var(--color-primary);
+  border: 2px solid var(--color-primary-light);
+  box-shadow: var(--shadow-soft);
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background-color: var(--color-primary-light);
+  color: white;
+  border-color: var(--color-primary);
+  transform: translateY(-1px) scale(1.02);
+  box-shadow: var(--shadow-medium);
+}
+
+.btn-link {
+  background: none;
+  border: none;
+  color: var(--color-primary);
+  text-decoration: none;
+  font-size: var(--font-size-sm);
+  padding: var(--space-sm);
+}
+
+.btn-link:hover {
+  color: var(--color-primary-dark);
+  text-decoration: underline;
+}
+
+/* Alerts */
+.alert {
+  padding: var(--space-md);
+  border-radius: var(--radius-medium);
+  font-size: var(--font-size-sm);
+  margin-bottom: var(--space-lg);
+}
+
+.alert-error {
+  background: linear-gradient(135deg, rgba(150, 3, 26, 0.08) 0%, rgba(150, 3, 26, 0.04) 100%);
+  color: var(--color-error);
+  border: 1px solid rgba(150, 3, 26, 0.2);
+  box-shadow: var(--shadow-soft);
+}
+
+.alert-success {
+  background: linear-gradient(135deg, rgba(74, 153, 96, 0.08) 0%, rgba(74, 153, 96, 0.04) 100%);
+  color: var(--color-success);
+  border: 1px solid rgba(74, 153, 96, 0.2);
+  box-shadow: var(--shadow-soft);
+}
+
+/* Loading Spinner */
+.spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--color-text-light);
+  border-top: 2px solid var(--color-primary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.small-spinner {
+  width: 16px;
+  height: 16px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Loading Text */
+.loading-text {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  font-size: var(--font-size-sm);
+}
+
+/* Page Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.page-enter {
+  animation: fadeIn 0.6s ease-out;
+}
+
+/* Utility Classes */
+.text-center { text-align: center; }
+.text-muted { color: var(--color-text-muted); }
+.text-small { font-size: var(--font-size-sm); }
+
+/* Enhanced Responsive Design System */
+@media (max-width: 1024px) {
+  :root {
+    --font-size-4xl: 2rem;      /* 32px */
+    --font-size-3xl: 1.75rem;   /* 28px */
+  }
+}
+
+@media (max-width: 768px) {
+  :root {
+    --font-size-4xl: 1.875rem;  /* 30px */
+    --font-size-3xl: 1.5rem;    /* 24px */
+    --font-size-2xl: 1.375rem;  /* 22px */
+    --font-size-xl: 1.125rem;   /* 18px */
+  }
+  
+  .btn {
+    padding: var(--space-md) var(--space-lg);
+  }
+
+  h1 { font-size: var(--font-size-3xl); }
+  h2 { font-size: var(--font-size-2xl); }
+  h3 { font-size: var(--font-size-xl); }
+}
+
+@media (max-width: 640px) {
+  :root {
+    --font-size-4xl: 1.75rem;   /* 28px */
+    --font-size-3xl: 1.375rem;  /* 22px */
+    --font-size-2xl: 1.25rem;   /* 20px */
+    --font-size-xl: 1.125rem;   /* 18px */
+    --font-size-lg: 1rem;       /* 16px */
+  }
+
+  .btn {
+    padding: var(--space-sm) var(--space-md);
+    font-size: var(--font-size-sm);
+  }
+
+  .form-input {
+    padding: var(--space-sm) var(--space-md);
+    font-size: var(--font-size-sm);
+  }
+
+  .form-label {
+    font-size: var(--font-size-xs);
+  }
+}
+
+@media (max-width: 480px) {
+  :root {
+    --font-size-4xl: 1.5rem;    /* 24px */
+    --font-size-3xl: 1.25rem;   /* 20px */
+    --font-size-2xl: 1.125rem;  /* 18px */
+    --font-size-xl: 1rem;       /* 16px */
+    --font-size-lg: 0.875rem;   /* 14px */
+  }
+
+  body {
+    font-size: var(--font-size-sm);
+  }
+
+  .btn {
+    padding: var(--space-xs) var(--space-sm);
+    font-size: var(--font-size-xs);
+    border-radius: var(--radius-medium);
+  }
+
+  .form-input {
+    padding: var(--space-xs) var(--space-sm);
+    font-size: var(--font-size-xs);
+    border-radius: var(--radius-small);
+  }
+
+  .alert {
+    padding: var(--space-sm);
+    font-size: var(--font-size-xs);
+  }
+
+  h1 { font-size: var(--font-size-2xl); }
+  h2 { font-size: var(--font-size-xl); }
+  h3 { font-size: var(--font-size-lg); }
+  h4 { font-size: var(--font-size-base); }
+  h5 { font-size: var(--font-size-sm); }
+  h6 { font-size: var(--font-size-xs); }
+}
+
+@media (max-width: 360px) {
+  :root {
+    --space-xs: 0.125rem;   /* 2px */
+    --space-sm: 0.25rem;    /* 4px */
+    --space-md: 0.5rem;     /* 8px */
+    --space-lg: 0.75rem;    /* 12px */
+    --space-xl: 1rem;       /* 16px */
+    --space-2xl: 1.5rem;    /* 24px */
+    --space-3xl: 2rem;      /* 32px */
+  }
+
+  .btn {
+    padding: var(--space-xs) var(--space-md);
+    font-size: var(--font-size-xs);
+  }
+}
