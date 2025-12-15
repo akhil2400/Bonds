@@ -6,6 +6,7 @@ import Layout from './components/layout/Layout';
 import Landing from './pages/Landing';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
+import ForgotPassword from './pages/ForgotPassword';
 import Home from './pages/Home';
 import Timeline from './pages/Timeline';
 import Memories from './pages/Memories';
@@ -23,6 +24,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Signup />} />
           <Route path="/signup" element={<Navigate to="/register" replace />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/dashboard" element={
             <ProtectedRoute>
               <Layout>

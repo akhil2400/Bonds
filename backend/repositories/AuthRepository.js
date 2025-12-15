@@ -35,6 +35,16 @@ class AuthRepository {
   async countByRole(role) {
     return await withDatabaseErrorHandling(() => User.countDocuments({ role }))();
   }
+
+  async updatePassword(email, hashedPassword) {
+    return await withDatabaseErrorHandling(() => 
+      User.findOneAndUpdate(
+        { email }, 
+        { password: hashedPassword }, 
+        { new: true }
+      ).select('-password')
+    )();
+  }
 }
 
 module.exports = new AuthRepository();

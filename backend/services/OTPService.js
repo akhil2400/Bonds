@@ -1,6 +1,6 @@
 const bcrypt = require('bcryptjs');
 const OtpRepository = require('../repositories/OtpRepository');
-const EmailService = require('../utils/email.service');
+const MailerService = require('../utils/mailer');
 const CustomError = require('../errors/CustomError');
 
 class OTPService {
@@ -66,8 +66,8 @@ class OTPService {
         attempts: 0
       });
 
-      // Send email using Resend
-      const emailResult = await EmailService.sendOTP(normalizedEmail, plainOTP, userName);
+      // Send email using Nodemailer
+      const emailResult = await MailerService.sendOTP(normalizedEmail, plainOTP, userName);
 
       console.log(`📧 OTP generated and sent to: ${normalizedEmail.replace(/(.{2}).*(@.*)/, '$1***$2')}`);
 
@@ -177,6 +177,57 @@ class OTPService {
     } catch (error) {
       console.error('Error getting OTP stats:', error);
       return { total: 0, used: 0, expired: 0, active: 0 };
+    }
+  }
+
+  // Generate and send password reset OTP
+  async generateAndSendPasswordResetOTP(email, userName = 'Friend') {
+    try {
+      // Normalize email
+      const normalizedEmail = email.toLowerCase().trim();
+
+      // Check rate limiting
+      await this.checkRateLimit(normalizedEmail);
+
+      // Generate OTP
+      const plainOTP = this.generateOTP();
+      const hashedOTP = await this.hashOTP(plainOTP);
+
+      // Calculate expiry
+      const expiresAt = new Date(Date.now() + this.OTP_EXPIRY_MINUTES * 60 * 1000);
+
+      // Delete any existing OTPs for this email
+      await OtpRepository.deleteByEmail(normalizedEmail);
+
+      // Create new OTP record with password reset type
+      const otpRecord = await OtpRepository.create({
+        email: normalizedEmail,
+        otp: hashedOTP,
+        expiresAt,
+        isUsed: false,
+        attempts: 0,
+        type: 'password_reset' // Add type to distinguish from signup OTPs
+      });
+
+      // Send password reset email using Nodemailer
+      const emailResult = await MailerService.sendPasswordResetOTP(normalizedEmail, plainOTP, userName);
+
+      console.log(`🔐 Password reset OTP generated and sent to: ${normalizedEmail.replace(/(.{2}).*(@.*)/, '$1***$2')}`);
+
+      return {
+        success: true,
+        message: 'Password reset code sent to your email',
+        otpId: otpRecord._id,
+        expiresAt,
+        messageId: emailResult.messageId
+      };
+
+    } catch (error) {
+      if (error instanceof CustomError) {
+        throw error;
+      }
+      console.error('Error in generateAndSendPasswordResetOTP:', error);
+      throw new CustomError('Failed to send password reset code', 500);
     }
   }
 

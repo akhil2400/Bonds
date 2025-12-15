@@ -13,4 +13,8 @@ router.post('/login', AuthController.login);
 router.post('/logout', AuthController.logout);
 router.get('/me', require('../middlewares/auth'), AuthController.me);
 
+// Password Reset
+router.post('/forgot-password', AuthController.forgotPassword);        // Step 1: Send reset OTP
+router.post('/reset-password', AuthController.resetPassword);          // Step 2: Reset password with OTP
+
 module.exports = router;

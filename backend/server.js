@@ -15,7 +15,7 @@ if (!process.env.MONGO_URI) {
 
 const app = require('./app');
 const connectDB = require('./config/db');
-const EmailService = require('./utils/email.service');
+const MailerService = require('./utils/mailer');
 const OTPService = require('./services/OTPService');
 
 const PORT = process.env.PORT || 5000;
@@ -47,11 +47,11 @@ const startServer = async () => {
     console.log('');
     console.log('📧 Step 3: Email Service Initialization');
     try {
-      await EmailService.verifyConnection();
-      console.log('✅ Resend email service ready');
+      await MailerService.verifyConnection();
+      console.log('✅ Nodemailer service ready');
     } catch (error) {
       console.log('⚠️  Email service will be initialized on first use');
-      console.log('💡 Make sure RESEND_API_KEY is configured in .env');
+      console.log('💡 Make sure EMAIL_USER and EMAIL_PASS are configured in .env');
     }
 
     // Step 4: Schedule background tasks

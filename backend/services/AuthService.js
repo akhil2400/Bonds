@@ -120,6 +120,37 @@ class AuthService {
 
     return { accessToken, refreshToken };
   }
+
+
+
+  // Reset user password
+  async resetUserPassword(email, newPassword) {
+    try {
+      // Hash the new password
+      const hashedPassword = await this.hashPassword(newPassword);
+
+      // Update user password
+      const updatedUser = await AuthRepository.updatePassword(email, hashedPassword);
+
+      if (!updatedUser) {
+        throw new CustomError('User not found', 404);
+      }
+
+      console.log(`🔐 Password reset successfully for: ${email}`);
+
+      return {
+        success: true,
+        message: 'Password reset successfully'
+      };
+
+    } catch (error) {
+      if (error instanceof CustomError) {
+        throw error;
+      }
+      console.error('Error in resetUserPassword:', error);
+      throw new CustomError('Failed to reset password', 500);
+    }
+  }
 }
 
 module.exports = new AuthService();

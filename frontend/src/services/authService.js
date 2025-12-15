@@ -68,5 +68,31 @@ export const authService = {
     } catch (error) {
       throw error;
     }
+  },
+
+  // Forgot password - Step 1: Send reset OTP
+  async forgotPassword(email) {
+    try {
+      console.log('Making API call to forgot password:', { email });
+      const response = await api.post('/auth/forgot-password', { email });
+      console.log('Forgot password API response:', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('Forgot password API error:', error);
+      throw error;
+    }
+  },
+
+  // Forgot password - Step 2: Reset password
+  async resetPassword(email, otp, newPassword) {
+    try {
+      console.log('Making API call to reset password:', { email, otp });
+      const response = await api.post('/auth/reset-password', { email, otp, newPassword });
+      console.log('Reset password API response:', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('Reset password API error:', error);
+      throw error;
+    }
   }
 };

@@ -183,6 +183,98 @@ class AuthController {
       next(error);
     }
   }
+
+  // Step 1: Forgot Password - Send OTP
+  async forgotPassword(req, res, next) {
+    try {
+      const { email } = req.body;
+
+      // Validate required fields
+      if (!email) {
+        return res.status(400).json({
+          success: false,
+          error: 'Email is required'
+        });
+      }
+
+      // Validate email format
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        return res.status(400).json({
+          success: false,
+          error: 'Please provide a valid email address'
+        });
+      }
+
+      // Check if user exists
+      const existingUser = await AuthService.checkUserExists(email);
+      if (!existingUser) {
+        return res.status(404).json({
+          success: false,
+          error: 'No account found with this email address'
+        });
+      }
+
+      // Generate and send password reset OTP
+      const result = await OTPService.generateAndSendPasswordResetOTP(email, existingUser.name);
+
+      res.status(200).json({
+        success: true,
+        message: result.message,
+        email: email.replace(/(.{2}).*(@.*)/, '$1***$2'), // Mask email for security
+        expiresAt: result.expiresAt
+      });
+
+    } catch (error) {
+      next(error);
+    }
+  }
+
+
+
+  // Step 2: Reset Password with OTP
+  async resetPassword(req, res, next) {
+    try {
+      const { email, otp, newPassword } = req.body;
+
+      // Validate required fields
+      if (!email || !otp || !newPassword) {
+        return res.status(400).json({
+          success: false,
+          error: 'Email, OTP, and new password are required'
+        });
+      }
+
+      // Validate password strength
+      if (newPassword.length < 6) {
+        return res.status(400).json({
+          success: false,
+          error: 'Password must be at least 6 characters long'
+        });
+      }
+
+      // Verify OTP one more time
+      const otpResult = await OTPService.verifyOTP(email, otp);
+
+      if (!otpResult.success) {
+        return res.status(400).json({
+          success: false,
+          error: 'Invalid or expired reset code'
+        });
+      }
+
+      // Update user password
+      const result = await AuthService.resetUserPassword(otpResult.email, newPassword);
+
+      res.status(200).json({
+        success: true,
+        message: 'Password reset successfully! You can now login with your new password.'
+      });
+
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 module.exports = new AuthController();
