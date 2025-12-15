@@ -10,6 +10,21 @@ const api = axios.create({
   },
 });
 
+// Request interceptor to add auth token if available
+api.interceptors.request.use(
+  (config) => {
+    // Try to get token from localStorage as fallback for mobile
+    const token = localStorage.getItem('authToken');
+    if (token && !config.headers.Authorization) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
 // Response interceptor for error handling
 api.interceptors.response.use(
   (response) => response,

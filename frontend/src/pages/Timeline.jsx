@@ -1,10 +1,22 @@
 import { useState, useEffect } from 'react';
 import { timelineService } from '../services/timelineService';
+import PermissionGate from '../components/common/PermissionGate';
+import { usePermissions } from '../context/PermissionContext';
+import './Timeline.css';
 
 const Timeline = () => {
   const [timelines, setTimelines] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [showCreateForm, setShowCreateForm] = useState(false);
+  const [newTimeline, setNewTimeline] = useState({
+    title: '',
+    description: '',
+    year: new Date().getFullYear(),
+    media: []
+  });
+  const [creating, setCreating] = useState(false);
+  const { canCreate, isTrustedMember } = usePermissions();
 
   useEffect(() => {
     fetchTimelines();
@@ -22,10 +34,30 @@ const Timeline = () => {
     }
   };
 
+  const handleCreateTimeline = async (e) => {
+    e.preventDefault();
+    try {
+      setCreating(true);
+      await timelineService.createTimeline(newTimeline);
+      setNewTimeline({
+        title: '',
+        description: '',
+        year: new Date().getFullYear(),
+        media: []
+      });
+      setShowCreateForm(false);
+      fetchTimelines();
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setCreating(false);
+    }
+  };
+
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+      <div className="loading-container">
+        <div className="spinner"></div>
       </div>
     );
   }
@@ -39,52 +71,130 @@ const Timeline = () => {
   }
 
   return (
-    <div className="max-w-4xl mx-auto">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Our Timeline</h1>
-        <p className="text-gray-600">The journey of our friendship through the years</p>
+    <div className="timeline-container">
+      <div className="timeline-header">
+        <div className="header-content">
+          <h1>Our Timeline</h1>
+          <p>
+            {isTrustedMember() 
+              ? 'The journey of our friendship through the years' 
+              : 'Witness the beautiful journey of our friendship'
+            }
+          </p>
+        </div>
+        <PermissionGate action="create">
+          <button 
+            className="add-timeline-btn"
+            onClick={() => setShowCreateForm(!showCreateForm)}
+          >
+            <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
+            </svg>
+            {showCreateForm ? 'Cancel' : 'Add Timeline'}
+          </button>
+        </PermissionGate>
       </div>
 
+      {error && (
+        <div className="alert alert-error">
+          {error}
+        </div>
+      )}
+
+      {/* Create Timeline Form */}
+      {showCreateForm && canCreate() && (
+        <div className="create-timeline-form">
+          <h3>Add Timeline Entry</h3>
+          <form onSubmit={handleCreateTimeline}>
+            <div className="form-row">
+              <div className="form-group">
+                <label>Year</label>
+                <input
+                  type="number"
+                  required
+                  min="1900"
+                  max="2100"
+                  value={newTimeline.year}
+                  onChange={(e) => setNewTimeline({ ...newTimeline, year: parseInt(e.target.value) })}
+                />
+              </div>
+              <div className="form-group flex-1">
+                <label>Title</label>
+                <input
+                  type="text"
+                  required
+                  value={newTimeline.title}
+                  onChange={(e) => setNewTimeline({ ...newTimeline, title: e.target.value })}
+                  placeholder="What happened this year?"
+                />
+              </div>
+            </div>
+            
+            <div className="form-group">
+              <label>Description</label>
+              <textarea
+                required
+                rows={3}
+                value={newTimeline.description}
+                onChange={(e) => setNewTimeline({ ...newTimeline, description: e.target.value })}
+                placeholder="Tell the story of this moment in time..."
+              />
+            </div>
+            
+            <div className="form-actions">
+              <button type="button" onClick={() => setShowCreateForm(false)}>
+                Cancel
+              </button>
+              <button type="submit" disabled={creating} className="primary">
+                {creating ? 'Adding...' : 'Add to Timeline'}
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
+
       {timelines.length === 0 ? (
-        <div className="text-center py-12">
-          <p className="text-gray-500">No timeline entries yet. Start creating memories!</p>
+        <div className="empty-state">
+          <p>
+            {isTrustedMember() 
+              ? 'No timeline entries yet. Start creating memories!' 
+              : 'No timeline entries shared yet. The trusted members will share their journey here!'
+            }
+          </p>
         </div>
       ) : (
-        <div className="space-y-8">
+        <div className="timeline-list">
           {timelines.map((timeline) => (
-            <div key={timeline._id} className="relative">
+            <div key={timeline._id} className="timeline-item">
               {/* Timeline line */}
-              <div className="absolute left-8 top-12 bottom-0 w-0.5 bg-gray-200"></div>
+              <div className="timeline-line"></div>
               
-              {/* Timeline item */}
-              <div className="flex items-start space-x-6">
+              {/* Timeline content */}
+              <div className="timeline-content">
                 {/* Year badge */}
-                <div className="flex-shrink-0 w-16 h-16 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold text-sm">
+                <div className="year-badge">
                   {timeline.year}
                 </div>
                 
-                {/* Content */}
-                <div className="flex-1 bg-white rounded-lg p-6 shadow-sm border border-gray-200">
-                  <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                    {timeline.title}
-                  </h3>
-                  <p className="text-gray-600 mb-4">{timeline.description}</p>
+                {/* Content card */}
+                <div className="timeline-card">
+                  <h3>{timeline.title}</h3>
+                  <p>{timeline.description}</p>
                   
                   {timeline.media && timeline.media.length > 0 && (
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mb-4">
+                    <div className="timeline-media">
                       {timeline.media.slice(0, 3).map((url, index) => (
                         <img
                           key={index}
                           src={url}
                           alt=""
-                          className="w-full h-24 object-cover rounded"
                         />
                       ))}
                     </div>
                   )}
                   
-                  <div className="text-sm text-gray-500">
-                    By {timeline.owner.name} • {new Date(timeline.createdAt).toLocaleDateString()}
+                  <div className="timeline-footer">
+                    By {timeline.owner?.name || 'Unknown'} • {new Date(timeline.createdAt).toLocaleDateString()}
                   </div>
                 </div>
               </div>

@@ -21,9 +21,9 @@ class TripController {
   async getTrip(req, res, next) {
     try {
       const { id } = req.params;
-      const userId = req.user ? req.user.id : null;
+      const user = req.user || null;
 
-      const trip = await TripService.getTripById(id, userId);
+      const trip = await TripService.getTripById(id, user);
 
       res.status(200).json({
         success: true,
@@ -65,9 +65,9 @@ class TripController {
   }
   async getAllTrips(req, res, next) {
     try {
-      const userId = req.user.id;
+      const user = req.user;
 
-      const trips = await TripService.getAllTrips(userId);
+      const trips = await TripService.getAllTrips(user);
 
       res.status(200).json({
         success: true,
@@ -82,10 +82,10 @@ class TripController {
   async updateTrip(req, res, next) {
     try {
       const { id } = req.params;
-      const userId = req.user.id;
+      const user = req.user;
       const updateData = req.body;
 
-      const trip = await TripService.updateTrip(id, userId, updateData);
+      const trip = await TripService.updateTrip(id, user, updateData);
 
       res.status(200).json({
         success: true,
@@ -100,9 +100,9 @@ class TripController {
   async deleteTrip(req, res, next) {
     try {
       const { id } = req.params;
-      const userId = req.user.id;
+      const user = req.user;
 
-      const result = await TripService.deleteTrip(id, userId);
+      const result = await TripService.deleteTrip(id, user);
 
       res.status(200).json({
         success: true,

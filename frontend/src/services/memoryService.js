@@ -26,5 +26,31 @@ export const memoryService = {
     } catch (error) {
       throw error;
     }
+  },
+
+  async createMemoryWithImages(formData) {
+    try {
+      const response = await api.post('/memory', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  async uploadImages(formData) {
+    try {
+      const response = await api.post('/memory/upload-images', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
   }
 };

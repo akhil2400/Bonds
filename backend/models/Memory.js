@@ -12,8 +12,18 @@ const memorySchema = new mongoose.Schema({
     trim: true
   },
   media: [{
-    type: String,
-    trim: true
+    url: {
+      type: String,
+      required: true
+    },
+    publicId: {
+      type: String,
+      required: true
+    },
+    width: Number,
+    height: Number,
+    format: String,
+    bytes: Number
   }],
   owner: {
     type: mongoose.Schema.Types.ObjectId,

@@ -56,7 +56,16 @@ const corsConfig = cors({
       'http://localhost:5174',
       'http://localhost:5175',
       'http://localhost:5176',
-      'http://localhost:5177'
+      'http://localhost:5177',
+      // Network access for mobile devices
+      'http://192.168.18.210:5173',
+      'http://192.168.18.210:5174',
+      'http://192.168.18.210:5175',
+      'http://192.168.18.210:5176',
+      'http://192.168.56.1:5173',
+      'http://192.168.56.1:5174',
+      'http://192.168.56.1:5175',
+      'http://192.168.56.1:5176'
     ];
     
     // Allow requests with no origin (mobile apps, etc.) in development

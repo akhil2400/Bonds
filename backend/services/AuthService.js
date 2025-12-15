@@ -16,7 +16,7 @@ class AuthService {
   }
 
   async registerUser(userData) {
-    const { name, email, mobile, password, isVerified = false } = userData;
+    const { name, email, password, isVerified = false } = userData;
 
     // Check if user already exists by email
     if (email) {
@@ -26,13 +26,7 @@ class AuthService {
       }
     }
 
-    // Check if user already exists by mobile
-    if (mobile) {
-      const existingUserByMobile = await AuthRepository.findByMobile(mobile);
-      if (existingUserByMobile) {
-        throw new CustomError('User already exists with this mobile number', 400);
-      }
-    }
+
 
     // Hash password
     const hashedPassword = await this.hashPassword(password);
@@ -45,10 +39,8 @@ class AuthService {
     const user = await AuthRepository.createUser({
       name,
       email,
-      mobile,
       password: hashedPassword,
       isVerified,
-      verificationMethod: mobile ? 'mobile' : 'email',
       role: isTrustedEmail ? 'member' : 'viewer', // Trusted emails get member role
       isTrustedMember: isTrustedEmail // Mark as trusted if in the list
     });
@@ -61,7 +53,6 @@ class AuthService {
         id: user._id,
         name: user.name,
         email: user.email,
-        mobile: user.mobile,
         role: user.role,
         isTrustedMember: user.isTrustedMember,
         isVerified: user.isVerified

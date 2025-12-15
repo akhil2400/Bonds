@@ -50,6 +50,12 @@ export const AuthProvider = ({ children }) => {
     try {
       dispatch({ type: 'SET_LOADING', payload: true });
       const response = await authService.login(credentials);
+      
+      // Store token in localStorage as fallback for mobile
+      if (response.token) {
+        localStorage.setItem('authToken', response.token);
+      }
+      
       dispatch({ type: 'SET_USER', payload: response.user });
       return response;
     } catch (error) {
@@ -73,9 +79,12 @@ export const AuthProvider = ({ children }) => {
   const logout = async () => {
     try {
       await authService.logout();
+      // Clear token from localStorage
+      localStorage.removeItem('authToken');
       dispatch({ type: 'CLEAR_USER' });
     } catch (error) {
       // Even if logout fails, clear user locally
+      localStorage.removeItem('authToken');
       dispatch({ type: 'CLEAR_USER' });
     }
   };

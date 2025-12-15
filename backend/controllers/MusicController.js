@@ -21,9 +21,9 @@ class MusicController {
   async getMusic(req, res, next) {
     try {
       const { id } = req.params;
-      const userId = req.user.id;
+      const user = req.user;
 
-      const music = await MusicService.getMusicById(id, userId);
+      const music = await MusicService.getMusicById(id, user);
 
       res.status(200).json({
         success: true,
@@ -51,9 +51,9 @@ class MusicController {
   }
   async getAllMusic(req, res, next) {
     try {
-      const userId = req.user.id;
+      const user = req.user;
 
-      const music = await MusicService.getAllMusic(userId);
+      const music = await MusicService.getAllMusic(user);
 
       res.status(200).json({
         success: true,
@@ -68,10 +68,10 @@ class MusicController {
   async updateMusic(req, res, next) {
     try {
       const { id } = req.params;
-      const userId = req.user.id;
+      const user = req.user;
       const updateData = req.body;
 
-      const music = await MusicService.updateMusic(id, userId, updateData);
+      const music = await MusicService.updateMusic(id, user, updateData);
 
       res.status(200).json({
         success: true,
@@ -86,9 +86,9 @@ class MusicController {
   async deleteMusic(req, res, next) {
     try {
       const { id } = req.params;
-      const userId = req.user.id;
+      const user = req.user;
 
-      const result = await MusicService.deleteMusic(id, userId);
+      const result = await MusicService.deleteMusic(id, user);
 
       res.status(200).json({
         success: true,

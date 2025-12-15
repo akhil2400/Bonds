@@ -1,5 +1,8 @@
 import { useState, useEffect } from 'react';
 import { thoughtService } from '../services/thoughtService';
+import PermissionGate from '../components/common/PermissionGate';
+import { usePermissions } from '../context/PermissionContext';
+import './Thoughts.css';
 
 const Thoughts = () => {
   const [thoughts, setThoughts] = useState([]);
@@ -8,6 +11,7 @@ const Thoughts = () => {
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [newThought, setNewThought] = useState({ title: '', content: '', isPrivate: true });
   const [creating, setCreating] = useState(false);
+  const { canCreate, isTrustedMember } = usePermissions();
 
   useEffect(() => {
     fetchThoughts();
@@ -42,80 +46,85 @@ const Thoughts = () => {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+      <div className="loading-container">
+        <div className="spinner"></div>
       </div>
     );
   }
 
   return (
-    <div className="max-w-4xl mx-auto">
-      <div className="flex justify-between items-center mb-8">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Thoughts</h1>
-          <p className="text-gray-600">Personal reflections and musings</p>
+    <div className="thoughts-container">
+      <div className="thoughts-header">
+        <div className="header-content">
+          <h1>Thoughts</h1>
+          <p>
+            {isTrustedMember() 
+              ? 'Personal reflections and musings' 
+              : 'Heartfelt thoughts and reflections from our friends'
+            }
+          </p>
         </div>
-        <button
-          onClick={() => setShowCreateForm(!showCreateForm)}
-          className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
-        >
-          {showCreateForm ? 'Cancel' : 'New Thought'}
-        </button>
+        <PermissionGate action="create">
+          <button
+            className="add-thought-btn"
+            onClick={() => setShowCreateForm(!showCreateForm)}
+          >
+            <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
+            </svg>
+            {showCreateForm ? 'Cancel' : 'New Thought'}
+          </button>
+        </PermissionGate>
       </div>
 
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md mb-6">
+        <div className="alert alert-error">
           {error}
         </div>
       )}
 
       {/* Create Form */}
-      {showCreateForm && (
-        <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200 mb-8">
+      {showCreateForm && canCreate() && (
+        <div className="create-thought-form">
+          <h3>Share Your Thoughts</h3>
           <form onSubmit={handleCreateThought}>
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Title
-              </label>
+            <div className="form-group">
+              <label>Title</label>
               <input
                 type="text"
                 required
                 value={newThought.title}
                 onChange={(e) => setNewThought({ ...newThought, title: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="What's on your mind?"
               />
             </div>
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Content
-              </label>
+            <div className="form-group">
+              <label>Content</label>
               <textarea
                 required
                 rows={4}
                 value={newThought.content}
                 onChange={(e) => setNewThought({ ...newThought, content: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Share your thoughts..."
               />
             </div>
-            <div className="flex items-center justify-between">
-              <label className="flex items-center">
+            <div className="form-footer">
+              <label className="privacy-toggle">
                 <input
                   type="checkbox"
                   checked={newThought.isPrivate}
                   onChange={(e) => setNewThought({ ...newThought, isPrivate: e.target.checked })}
-                  className="mr-2"
                 />
-                <span className="text-sm text-gray-600">Keep private</span>
+                <span>Keep private</span>
               </label>
-              <button
-                type="submit"
-                disabled={creating}
-                className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 disabled:opacity-50"
-              >
-                {creating ? 'Creating...' : 'Create Thought'}
-              </button>
+              <div className="form-actions">
+                <button type="button" onClick={() => setShowCreateForm(false)}>
+                  Cancel
+                </button>
+                <button type="submit" disabled={creating} className="primary">
+                  {creating ? 'Creating...' : 'Share Thought'}
+                </button>
+              </div>
             </div>
           </form>
         </div>
@@ -123,24 +132,29 @@ const Thoughts = () => {
 
       {/* Thoughts List */}
       {thoughts.length === 0 ? (
-        <div className="text-center py-12">
-          <p className="text-gray-500">No thoughts yet. Share what's on your mind!</p>
+        <div className="empty-state">
+          <p>
+            {isTrustedMember() 
+              ? 'No thoughts yet. Share what\'s on your mind!' 
+              : 'No thoughts shared yet. The trusted members will share their reflections here!'
+            }
+          </p>
         </div>
       ) : (
-        <div className="space-y-6">
+        <div className="thoughts-list">
           {thoughts.map((thought) => (
-            <div key={thought._id} className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
-              <div className="flex items-start justify-between mb-3">
-                <h3 className="text-xl font-semibold text-gray-900">{thought.title}</h3>
+            <div key={thought._id} className="thought-card">
+              <div className="thought-header">
+                <h3>{thought.title}</h3>
                 {thought.isPrivate && (
-                  <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">
+                  <span className="private-badge">
                     Private
                   </span>
                 )}
               </div>
-              <p className="text-gray-600 mb-4 whitespace-pre-wrap">{thought.content}</p>
-              <div className="flex items-center justify-between text-sm text-gray-500">
-                <span>By {thought.owner.name}</span>
+              <p className="thought-content">{thought.content}</p>
+              <div className="thought-footer">
+                <span>By {thought.owner?.name || 'Unknown'}</span>
                 <span>{new Date(thought.createdAt).toLocaleDateString()}</span>
               </div>
             </div>

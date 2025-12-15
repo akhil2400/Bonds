@@ -1,5 +1,6 @@
 const TripRepository = require('../repositories/TripRepository');
 const CustomError = require('../errors/CustomError');
+const { isTrustedMember } = require('../middlewares/authorization');
 
 class TripService {
   async createTrip(userId, tripData) {
@@ -29,16 +30,19 @@ class TripService {
     return trip;
   }
 
-  async getTripById(tripId, userId = null) {
+  async getTripById(tripId, user = null) {
     const trip = await TripRepository.findById(tripId);
     
     if (!trip) {
       throw new CustomError('Trip not found', 404);
     }
 
-    // Check if user can access this trip
-    if (!trip.isPublic && (!userId || trip.owner._id.toString() !== userId)) {
-      throw new CustomError('Access denied', 403);
+    // Trusted members can access all trips (public + private from any trusted member)
+    // Viewers can only access public trips
+    if (!trip.isPublic) {
+      if (!user || !isTrustedMember(user)) {
+        throw new CustomError('Access denied', 403);
+      }
     }
 
     return trip;
@@ -51,28 +55,28 @@ class TripService {
   async getPublicTrips() {
     return await TripRepository.findPublic();
   }
-  async getAllTrips(userId) {
-    // Return public trips and user's own trips
-    const filter = {
-      $or: [
-        { isPublic: true },
-        { owner: userId }
-      ]
-    };
-    
-    return await TripRepository.findAll(filter);
+  async getAllTrips(user) {
+    // Trusted members can see all trips (public + private from any trusted member)
+    // Viewers can only see public trips
+    if (isTrustedMember(user)) {
+      // Trusted members see everything
+      return await TripRepository.findAll({});
+    } else {
+      // Viewers only see public trips
+      return await TripRepository.findAll({ isPublic: true });
+    }
   }
 
-  async updateTrip(tripId, userId, updateData) {
+  async updateTrip(tripId, user, updateData) {
     const trip = await TripRepository.findById(tripId);
     
     if (!trip) {
       throw new CustomError('Trip not found', 404);
     }
 
-    // Validate ownership
-    if (trip.owner._id.toString() !== userId) {
-      throw new CustomError('Access denied. You can only update your own trips', 403);
+    // Only trusted members can update trips (shared ownership model)
+    if (!isTrustedMember(user)) {
+      throw new CustomError('Access denied. Only trusted members can update trips', 403);
     }
 
     // Validate dates if being updated
@@ -89,16 +93,16 @@ class TripService {
     return updatedTrip;
   }
 
-  async deleteTrip(tripId, userId) {
+  async deleteTrip(tripId, user) {
     const trip = await TripRepository.findById(tripId);
     
     if (!trip) {
       throw new CustomError('Trip not found', 404);
     }
 
-    // Validate ownership
-    if (trip.owner._id.toString() !== userId) {
-      throw new CustomError('Access denied. You can only delete your own trips', 403);
+    // Only trusted members can delete trips (shared ownership model)
+    if (!isTrustedMember(user)) {
+      throw new CustomError('Access denied. Only trusted members can delete trips', 403);
     }
 
     await TripRepository.delete(tripId);

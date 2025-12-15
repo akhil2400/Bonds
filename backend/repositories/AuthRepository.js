@@ -6,9 +6,7 @@ class AuthRepository {
     return await withDatabaseErrorHandling(() => User.findOne({ email }))();
   }
 
-  async findByMobile(mobile) {
-    return await withDatabaseErrorHandling(() => User.findOne({ mobile }))();
-  }
+
 
   async findById(id) {
     return await withDatabaseErrorHandling(() => User.findById(id))();

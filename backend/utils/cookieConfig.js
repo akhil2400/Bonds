@@ -4,9 +4,9 @@ const getCookieOptions = () => {
   
   return {
     httpOnly: true,
-    secure: isProduction,
-    sameSite: isProduction ? 'strict' : 'lax',
-    domain: isProduction ? process.env.COOKIE_DOMAIN : undefined,
+    secure: false, // Allow non-HTTPS in development for network access
+    sameSite: 'lax', // More permissive for cross-origin in development
+    domain: undefined, // Don't set domain in development for IP access
     path: '/'
   };
 };
@@ -26,9 +26,9 @@ const getClearCookieOptions = () => {
   
   return {
     httpOnly: true,
-    secure: isProduction,
-    sameSite: isProduction ? 'strict' : 'lax',
-    domain: isProduction ? process.env.COOKIE_DOMAIN : undefined,
+    secure: false, // Allow non-HTTPS in development for network access
+    sameSite: 'lax', // More permissive for cross-origin in development
+    domain: undefined, // Don't set domain in development for IP access
     path: '/'
   };
 };

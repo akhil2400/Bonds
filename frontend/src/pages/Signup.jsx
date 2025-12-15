@@ -6,12 +6,10 @@ import './Login.css'; // Reusing login styles
 
 const Signup = () => {
   const { register, isAuthenticated, loading, error, clearError } = useAuth();
-  const [step, setStep] = useState(1); // 1: Form, 2: OTP Verification, 3: Success
-  const [verificationMethod, setVerificationMethod] = useState('email'); // 'email' or 'mobile'
+  const [step, setStep] = useState(1); // 1: Form, 2: OTP Verification
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    mobile: '',
     password: '',
     confirmPassword: ''
   });
@@ -179,83 +177,20 @@ const Signup = () => {
       </div>
 
       <div className="form-group">
-        <label className="form-label">Verification Method</label>
-        <div className="verification-method-selector">
-          <label className="radio-option">
-            <input
-              type="radio"
-              name="verificationMethod"
-              value="email"
-              checked={verificationMethod === 'email'}
-              onChange={(e) => setVerificationMethod(e.target.value)}
-            />
-            <span>Email Verification</span>
-          </label>
-          <label className="radio-option">
-            <input
-              type="radio"
-              name="verificationMethod"
-              value="mobile"
-              checked={verificationMethod === 'mobile'}
-              onChange={(e) => setVerificationMethod(e.target.value)}
-            />
-            <span>SMS Verification</span>
-          </label>
-        </div>
+        <label htmlFor="email" className="form-label">
+          Email address
+        </label>
+        <input
+          id="email"
+          name="email"
+          type="email"
+          required
+          value={formData.email}
+          onChange={handleChange}
+          className="form-input"
+          placeholder="Enter your email"
+        />
       </div>
-
-      {verificationMethod === 'email' && (
-        <div className="form-group">
-          <label htmlFor="email" className="form-label">
-            Email address
-          </label>
-          <input
-            id="email"
-            name="email"
-            type="email"
-            required
-            value={formData.email}
-            onChange={handleChange}
-            className="form-input"
-            placeholder="Enter your email"
-          />
-        </div>
-      )}
-
-      {verificationMethod === 'mobile' && (
-        <div className="form-group">
-          <label htmlFor="mobile" className="form-label">
-            Mobile Number
-          </label>
-          <input
-            id="mobile"
-            name="mobile"
-            type="tel"
-            required
-            value={formData.mobile}
-            onChange={handleChange}
-            className="form-input"
-            placeholder="Enter your mobile number"
-          />
-        </div>
-      )}
-
-      {verificationMethod === 'mobile' && (
-        <div className="form-group">
-          <label htmlFor="email" className="form-label">
-            Email address (optional)
-          </label>
-          <input
-            id="email"
-            name="email"
-            type="email"
-            value={formData.email}
-            onChange={handleChange}
-            className="form-input"
-            placeholder="Enter your email (optional)"
-          />
-        </div>
-      )}
 
       <div className="form-group">
         <label htmlFor="password" className="form-label">
@@ -326,11 +261,10 @@ const Signup = () => {
 
       <div className="otp-info">
         <p>
-          We've sent a 6-digit verification code to your{' '}
-          {verificationMethod === 'email' ? 'email' : 'mobile number'}:
+          We've sent a 6-digit verification code to your email:
         </p>
         <strong>
-          {verificationMethod === 'email' ? formData.email : formData.mobile}
+          {formData.email}
         </strong>
       </div>
 

@@ -9,10 +9,10 @@ const CustomError = require('../errors/CustomError');
 
 // List of trusted member emails (the 4 friends)
 const TRUSTED_MEMBER_EMAILS = [
-  'akhilkrishna2400@gmail.com', // Add the actual emails of the 4 trusted friends
-  'friend2@example.com',
-  'friend3@example.com',
-  'friend4@example.com'
+  'bondforever44@gmail.com', // Account owner (can receive emails in testing mode)
+  'akhilathul56@gmail.com', // Your actual registered email  
+  'friend2@example.com', // Add the actual emails of the 4 trusted friends
+  'friend3@example.com'
 ];
 
 /**

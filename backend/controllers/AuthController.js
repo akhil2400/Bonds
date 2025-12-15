@@ -49,8 +49,7 @@ class AuthController {
         success: true,
         message: result.message,
         email: email.replace(/(.{2}).*(@.*)/, '$1***$2'), // Mask email for security
-        expiresAt: result.expiresAt,
-        previewUrl: result.previewUrl // For development
+        expiresAt: result.expiresAt
       });
 
     } catch (error) {
@@ -122,8 +121,7 @@ class AuthController {
         success: true,
         message: result.message,
         email: email.replace(/(.{2}).*(@.*)/, '$1***$2'),
-        expiresAt: result.expiresAt,
-        previewUrl: result.previewUrl
+        expiresAt: result.expiresAt
       });
 
     } catch (error) {
@@ -138,13 +136,22 @@ class AuthController {
       const result = await AuthService.loginUser(email, password);
 
       // Set JWT tokens in httpOnly cookies
-      res.cookie('accessToken', result.accessToken, getAccessTokenOptions());
-      res.cookie('refreshToken', result.refreshToken, getRefreshTokenOptions());
+      const accessOptions = getAccessTokenOptions();
+      const refreshOptions = getRefreshTokenOptions();
+      
+      console.log('🍪 Setting cookies with options:', { accessOptions, refreshOptions });
+      
+      res.cookie('accessToken', result.accessToken, accessOptions);
+      res.cookie('refreshToken', result.refreshToken, refreshOptions);
+
+      console.log('✅ Login successful for:', result.user.email);
 
       res.status(200).json({
         success: true,
         message: 'Login successful',
-        user: result.user
+        user: result.user,
+        // Include token for mobile fallback (when cookies don't work)
+        token: result.accessToken
       });
     } catch (error) {
       next(error);

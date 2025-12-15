@@ -1,6 +1,6 @@
 const bcrypt = require('bcryptjs');
 const OtpRepository = require('../repositories/OtpRepository');
-const Mailer = require('../utils/mailer');
+const EmailService = require('../utils/email.service');
 const CustomError = require('../errors/CustomError');
 
 class OTPService {
@@ -66,17 +66,17 @@ class OTPService {
         attempts: 0
       });
 
-      // Send email
-      const emailResult = await Mailer.sendOTP(normalizedEmail, plainOTP, userName);
+      // Send email using Resend
+      const emailResult = await EmailService.sendOTP(normalizedEmail, plainOTP, userName);
 
-      console.log(`📧 OTP generated and sent to: ${normalizedEmail}`);
+      console.log(`📧 OTP generated and sent to: ${normalizedEmail.replace(/(.{2}).*(@.*)/, '$1***$2')}`);
 
       return {
         success: true,
         message: 'Verification code sent to your email',
         otpId: otpRecord._id,
         expiresAt,
-        previewUrl: emailResult.previewUrl // For development
+        messageId: emailResult.messageId
       };
 
     } catch (error) {

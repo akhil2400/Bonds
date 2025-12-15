@@ -1,5 +1,6 @@
 const MusicRepository = require('../repositories/MusicRepository');
 const CustomError = require('../errors/CustomError');
+const { isTrustedMember } = require('../middlewares/authorization');
 
 class MusicService {
   async createMusic(userId, musicData) {
@@ -21,16 +22,19 @@ class MusicService {
     return music;
   }
 
-  async getMusicById(musicId, userId) {
+  async getMusicById(musicId, user) {
     const music = await MusicRepository.findById(musicId);
     
     if (!music) {
       throw new CustomError('Music not found', 404);
     }
 
-    // Check if user can access this music
-    if (music.isPrivate && music.owner._id.toString() !== userId) {
-      throw new CustomError('Access denied', 403);
+    // Trusted members can access all music (public + private from any trusted member)
+    // Viewers can only access public music
+    if (music.isPrivate) {
+      if (!isTrustedMember(user)) {
+        throw new CustomError('Access denied', 403);
+      }
     }
 
     return music;
@@ -40,27 +44,27 @@ class MusicService {
     return await MusicRepository.findByOwner(userId);
   }
 
-  async getAllMusic(userId) {
-    // Return public music and user's own music
-    const filter = {
-      $or: [
-        { isPrivate: false },
-        { owner: userId }
-      ]
-    };
-    
-    return await MusicRepository.findAll(filter);
+  async getAllMusic(user) {
+    // Trusted members can see all music (public + private from any trusted member)
+    // Viewers can only see public music
+    if (isTrustedMember(user)) {
+      // Trusted members see everything
+      return await MusicRepository.findAll({});
+    } else {
+      // Viewers only see public music
+      return await MusicRepository.findAll({ isPrivate: false });
+    }
   }
-  async updateMusic(musicId, userId, updateData) {
+  async updateMusic(musicId, user, updateData) {
     const music = await MusicRepository.findById(musicId);
     
     if (!music) {
       throw new CustomError('Music not found', 404);
     }
 
-    // Validate ownership
-    if (music.owner._id.toString() !== userId) {
-      throw new CustomError('Access denied. You can only update your own music', 403);
+    // Only trusted members can update music (shared ownership model)
+    if (!isTrustedMember(user)) {
+      throw new CustomError('Access denied. Only trusted members can update music', 403);
     }
 
     // Validate link if being updated
@@ -76,16 +80,16 @@ class MusicService {
     return updatedMusic;
   }
 
-  async deleteMusic(musicId, userId) {
+  async deleteMusic(musicId, user) {
     const music = await MusicRepository.findById(musicId);
     
     if (!music) {
       throw new CustomError('Music not found', 404);
     }
 
-    // Validate ownership
-    if (music.owner._id.toString() !== userId) {
-      throw new CustomError('Access denied. You can only delete your own music', 403);
+    // Only trusted members can delete music (shared ownership model)
+    if (!isTrustedMember(user)) {
+      throw new CustomError('Access denied. Only trusted members can delete music', 403);
     }
 
     await MusicRepository.delete(musicId);

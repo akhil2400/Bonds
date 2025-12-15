@@ -92,24 +92,6 @@
   text-decoration: underline;
 }
 /* OTP Verification Styles */
-.verification-method-selector {
-  display: flex;
-  gap: 1rem;
-  margin-top: 0.5rem;
-}
-
-.radio-option {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  cursor: pointer;
-  font-size: 0.875rem;
-  color: #374151;
-}
-
-.radio-option input[type="radio"] {
-  margin: 0;
-}
 
 .otp-info {
   background-color: #f3f4f6;
@@ -167,26 +149,6 @@
   text-decoration: none;
 }
 /* OTP Verification Styles - Minimal & Personal */
-.verification-method-selector {
-  display: flex;
-  gap: var(--space-lg);
-  margin-top: var(--space-sm);
-}
-
-.radio-option {
-  display: flex;
-  align-items: center;
-  gap: var(--space-sm);
-  cursor: pointer;
-  font-size: var(--font-size-sm);
-  color: var(--color-text-secondary);
-  font-weight: var(--font-weight-medium);
-}
-
-.radio-option input[type="radio"] {
-  margin: 0;
-  accent-color: var(--color-primary);
-}
 
 .otp-info {
   background: linear-gradient(135deg, var(--color-surface-warm) 0%, var(--color-surface) 100%);
@@ -279,10 +241,7 @@
     font-size: var(--font-size-sm);
   }
 
-  .verification-method-selector {
-    flex-direction: column;
-    gap: var(--space-md);
-  }
+
 
   .otp-input {
     font-size: var(--font-size-lg);
@@ -371,11 +330,5 @@
     padding: var(--space-md) var(--space-sm);
   }
 
-  .radio-option {
-    font-size: var(--font-size-xs);
-  }
 
-  .verification-method-selector {
-    gap: var(--space-sm);
-  }
 }

@@ -1,10 +1,24 @@
 import { useState, useEffect } from 'react';
 import { musicService } from '../services/musicService';
+import PermissionGate from '../components/common/PermissionGate';
+import { usePermissions } from '../context/PermissionContext';
+import './Music.css';
 
 const Music = () => {
   const [music, setMusic] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [showCreateForm, setShowCreateForm] = useState(false);
+  const [newMusic, setNewMusic] = useState({
+    title: '',
+    artist: '',
+    platform: 'Spotify',
+    link: '',
+    description: '',
+    isPrivate: false
+  });
+  const [creating, setCreating] = useState(false);
+  const { canCreate, isTrustedMember } = usePermissions();
 
   useEffect(() => {
     fetchMusic();
@@ -19,6 +33,28 @@ const Music = () => {
       setError(err.message);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleCreateMusic = async (e) => {
+    e.preventDefault();
+    try {
+      setCreating(true);
+      await musicService.createMusic(newMusic);
+      setNewMusic({
+        title: '',
+        artist: '',
+        platform: 'Spotify',
+        link: '',
+        description: '',
+        isPrivate: false
+      });
+      setShowCreateForm(false);
+      fetchMusic();
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setCreating(false);
     }
   };
 
@@ -47,62 +83,177 @@ const Music = () => {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+      <div className="loading-container">
+        <div className="spinner"></div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md">
+      <div className="alert alert-error">
         Error loading music: {error}
       </div>
     );
   }
 
   return (
-    <div className="max-w-4xl mx-auto">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Our Music</h1>
-        <p className="text-gray-600">Songs that soundtrack our friendship</p>
+    <div className="music-container">
+      <div className="music-header">
+        <div className="header-content">
+          <h1>Our Music</h1>
+          <p>
+            {isTrustedMember() 
+              ? 'Songs that soundtrack our friendship' 
+              : 'Discover the music that defines our friendship'
+            }
+          </p>
+        </div>
+        <PermissionGate action="create">
+          <button 
+            className="add-music-btn"
+            onClick={() => setShowCreateForm(!showCreateForm)}
+          >
+            <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
+            </svg>
+            {showCreateForm ? 'Cancel' : 'Add Music'}
+          </button>
+        </PermissionGate>
       </div>
 
+      {error && (
+        <div className="alert alert-error">
+          {error}
+        </div>
+      )}
+
+      {/* Create Music Form */}
+      {showCreateForm && canCreate() && (
+        <div className="create-music-form">
+          <h3>Add Music Track</h3>
+          <form onSubmit={handleCreateMusic}>
+            <div className="form-row">
+              <div className="form-group flex-1">
+                <label>Song Title</label>
+                <input
+                  type="text"
+                  required
+                  value={newMusic.title}
+                  onChange={(e) => setNewMusic({ ...newMusic, title: e.target.value })}
+                  placeholder="Song title..."
+                />
+              </div>
+              <div className="form-group flex-1">
+                <label>Artist</label>
+                <input
+                  type="text"
+                  required
+                  value={newMusic.artist}
+                  onChange={(e) => setNewMusic({ ...newMusic, artist: e.target.value })}
+                  placeholder="Artist name..."
+                />
+              </div>
+            </div>
+            
+            <div className="form-row">
+              <div className="form-group">
+                <label>Platform</label>
+                <select
+                  value={newMusic.platform}
+                  onChange={(e) => setNewMusic({ ...newMusic, platform: e.target.value })}
+                >
+                  <option value="Spotify">Spotify</option>
+                  <option value="YouTube">YouTube</option>
+                  <option value="Apple Music">Apple Music</option>
+                  <option value="SoundCloud">SoundCloud</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+              <div className="form-group flex-1">
+                <label>Link</label>
+                <input
+                  type="url"
+                  required
+                  value={newMusic.link}
+                  onChange={(e) => setNewMusic({ ...newMusic, link: e.target.value })}
+                  placeholder="https://..."
+                />
+              </div>
+            </div>
+            
+            <div className="form-group">
+              <label>Description (Optional)</label>
+              <textarea
+                rows={2}
+                value={newMusic.description}
+                onChange={(e) => setNewMusic({ ...newMusic, description: e.target.value })}
+                placeholder="Why this song is special..."
+              />
+            </div>
+            
+            <div className="form-footer">
+              <label className="privacy-toggle">
+                <input
+                  type="checkbox"
+                  checked={newMusic.isPrivate}
+                  onChange={(e) => setNewMusic({ ...newMusic, isPrivate: e.target.checked })}
+                />
+                <span>Keep private</span>
+              </label>
+              <div className="form-actions">
+                <button type="button" onClick={() => setShowCreateForm(false)}>
+                  Cancel
+                </button>
+                <button type="submit" disabled={creating} className="primary">
+                  {creating ? 'Adding...' : 'Add Track'}
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+      )}
+
       {music.length === 0 ? (
-        <div className="text-center py-12">
-          <p className="text-gray-500">No music tracks yet. Start sharing your favorites!</p>
+        <div className="empty-state">
+          <p>
+            {isTrustedMember() 
+              ? 'No music tracks yet. Start sharing your favorites!' 
+              : 'No music shared yet. The trusted members will share their favorite songs here!'
+            }
+          </p>
         </div>
       ) : (
-        <div className="space-y-4">
+        <div className="music-list">
           {music.map((track) => (
-            <div key={track._id} className="bg-white rounded-lg p-4 shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
-              <div className="flex items-center space-x-4">
+            <div key={track._id} className="music-card">
+              <div className="music-content">
                 {/* Platform Icon */}
-                {getPlatformIcon(track.platform)}
+                <div className="platform-icon">
+                  {getPlatformIcon(track.platform)}
+                </div>
                 
                 {/* Track Info */}
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center space-x-2 mb-1">
-                    <h3 className="text-lg font-semibold text-gray-900 truncate">
-                      {track.title}
-                    </h3>
+                <div className="track-info">
+                  <div className="track-header">
+                    <h3>{track.title}</h3>
                     {track.isPrivate && (
-                      <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">
+                      <span className="private-badge">
                         Private
                       </span>
                     )}
                   </div>
-                  <p className="text-gray-600 mb-1">by {track.artist}</p>
+                  <p className="artist">by {track.artist}</p>
                   {track.description && (
-                    <p className="text-sm text-gray-500 mb-2">{track.description}</p>
+                    <p className="description">{track.description}</p>
                   )}
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-4 text-sm text-gray-500">
-                      <span className="flex items-center">
-                        <span className="w-2 h-2 bg-blue-500 rounded-full mr-2"></span>
+                  <div className="track-footer">
+                    <div className="track-meta">
+                      <span className="platform">
+                        <span className="platform-dot"></span>
                         {track.platform}
                       </span>
-                      <span>Added by {track.owner.name}</span>
+                      <span>Added by {track.owner?.name || 'Unknown'}</span>
                       <span>{new Date(track.createdAt).toLocaleDateString()}</span>
                     </div>
                     
@@ -111,9 +262,9 @@ const Music = () => {
                       href={track.link}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center space-x-1 text-blue-600 hover:text-blue-700 text-sm font-medium"
+                      className="play-btn"
                     >
-                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                      <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
                       </svg>
                       <span>Play</span>

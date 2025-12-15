@@ -21,9 +21,9 @@ class ThoughtController {
   async getThought(req, res, next) {
     try {
       const { id } = req.params;
-      const userId = req.user.id;
+      const user = req.user;
 
-      const thought = await ThoughtService.getThoughtById(id, userId);
+      const thought = await ThoughtService.getThoughtById(id, user);
 
       res.status(200).json({
         success: true,
@@ -51,9 +51,9 @@ class ThoughtController {
   }
   async getAllThoughts(req, res, next) {
     try {
-      const userId = req.user.id;
+      const user = req.user;
 
-      const thoughts = await ThoughtService.getAllThoughts(userId);
+      const thoughts = await ThoughtService.getAllThoughts(user);
 
       res.status(200).json({
         success: true,
@@ -68,10 +68,10 @@ class ThoughtController {
   async updateThought(req, res, next) {
     try {
       const { id } = req.params;
-      const userId = req.user.id;
+      const user = req.user;
       const updateData = req.body;
 
-      const thought = await ThoughtService.updateThought(id, userId, updateData);
+      const thought = await ThoughtService.updateThought(id, user, updateData);
 
       res.status(200).json({
         success: true,
@@ -86,9 +86,9 @@ class ThoughtController {
   async deleteThought(req, res, next) {
     try {
       const { id } = req.params;
-      const userId = req.user.id;
+      const user = req.user;
 
-      const result = await ThoughtService.deleteThought(id, userId);
+      const result = await ThoughtService.deleteThought(id, user);
 
       res.status(200).json({
         success: true,

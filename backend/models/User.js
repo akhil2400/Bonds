@@ -13,11 +13,7 @@ const userSchema = new mongoose.Schema({
     lowercase: true,
     trim: true
   },
-  mobile: {
-    type: String,
-    trim: true,
-    sparse: true // Allows multiple null values but unique non-null values
-  },
+
   password: {
     type: String,
     required: [true, 'Password is required']
@@ -41,11 +37,7 @@ const userSchema = new mongoose.Schema({
     default: false,
     index: true
   },
-  verificationMethod: {
-    type: String,
-    enum: ['email', 'mobile'],
-    default: 'email'
-  }
+
 }, {
   timestamps: true
 });

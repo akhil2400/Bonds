@@ -23,7 +23,7 @@ class TimelineController {
       const { id } = req.params;
       const userId = req.user.id;
 
-      const timeline = await TimelineService.getTimelineById(id, userId);
+      const timeline = await TimelineService.getTimelineById(id, userId, req.user);
 
       res.status(200).json({
         success: true,
@@ -53,7 +53,7 @@ class TimelineController {
     try {
       const userId = req.user.id;
 
-      const timelines = await TimelineService.getAllTimelines(userId);
+      const timelines = await TimelineService.getAllTimelines(userId, req.user);
 
       res.status(200).json({
         success: true,
@@ -71,7 +71,7 @@ class TimelineController {
       const userId = req.user.id;
       const updateData = req.body;
 
-      const timeline = await TimelineService.updateTimeline(id, userId, updateData);
+      const timeline = await TimelineService.updateTimeline(id, userId, updateData, req.user);
 
       res.status(200).json({
         success: true,
@@ -88,7 +88,7 @@ class TimelineController {
       const { id } = req.params;
       const userId = req.user.id;
 
-      const result = await TimelineService.deleteTimeline(id, userId);
+      const result = await TimelineService.deleteTimeline(id, userId, req.user);
 
       res.status(200).json({
         success: true,

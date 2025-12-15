@@ -4,12 +4,28 @@ const CustomError = require('../errors/CustomError');
 
 const auth = async (req, res, next) => {
   try {
-    // Get token from httpOnly cookie
-    const token = req.cookies.accessToken;
+    // Debug: Log cookies and headers received
+    console.log('🍪 Cookies received:', Object.keys(req.cookies));
+    console.log('🔍 Authorization header:', req.headers.authorization ? 'Present' : 'Not present');
+    
+    // Try to get token from httpOnly cookie first
+    let token = req.cookies.accessToken;
+    
+    // If no cookie token, try Authorization header as fallback
+    if (!token && req.headers.authorization) {
+      const authHeader = req.headers.authorization;
+      if (authHeader.startsWith('Bearer ')) {
+        token = authHeader.substring(7);
+        console.log('✅ Token found in Authorization header');
+      }
+    }
 
     if (!token) {
+      console.log('❌ No token found in cookies or Authorization header');
       throw new CustomError('Access denied. No token provided', 401);
     }
+    
+    console.log('✅ Token found, verifying...');
 
     // Verify token
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
