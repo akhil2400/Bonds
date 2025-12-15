@@ -29,7 +29,7 @@ async function verifyResendSetup() {
 
     // Test OTP email sending to account owner
     console.log('\n3️⃣ OTP Email Delivery Test:');
-    const accountOwnerEmail = 'bondforever44@gmail.com';
+    const accountOwnerEmail = process.env.TRUSTED_EMAIL_1 || 'test@example.com';
     const testOTP = '123456';
     const testUserName = 'Test User';
 

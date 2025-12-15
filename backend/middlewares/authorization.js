@@ -9,10 +9,10 @@ const CustomError = require('../errors/CustomError');
 
 // List of trusted member emails (the 4 friends)
 const TRUSTED_MEMBER_EMAILS = [
-  'bondforever44@gmail.com', // Account owner (can receive emails in testing mode)
-  'akhilathul56@gmail.com', // Your actual registered email  
-  'friend2@example.com', // Add the actual emails of the 4 trusted friends
-  'friend3@example.com'
+  process.env.TRUSTED_EMAIL_1 || 'user1@example.com',
+  process.env.TRUSTED_EMAIL_2 || 'user2@example.com', 
+  process.env.TRUSTED_EMAIL_3 || 'user3@example.com',
+  process.env.TRUSTED_EMAIL_4 || 'user4@example.com'
 ];
 
 /**

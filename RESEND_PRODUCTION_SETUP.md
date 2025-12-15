@@ -33,7 +33,7 @@ Hi Resend Team,
 
 I'm using Resend for OTP email verification in my Node.js application that will be deployed on Vercel.
 
-Could you please move my account (API Key: re_N3wSfnzY_MifuVr1npG2g5jAcwtJUjVXX) out of testing mode so I can send emails to any recipient using your default sender domain (onboarding@resend.dev)?
+Could you please move my account (API Key: [YOUR_API_KEY]) out of testing mode so I can send emails to any recipient using your default sender domain (onboarding@resend.dev)?
 
 I don't have a custom domain to verify, so I'd like to use Resend's verified domain for production use.
 
@@ -49,7 +49,7 @@ Thank you!
 
 ### Environment Variables (.env)
 ```env
-RESEND_API_KEY=re_N3wSfnzY_MifuVr1npG2g5jAcwtJUjVXX
+RESEND_API_KEY=your-resend-api-key
 EMAIL_FROM=onboarding@resend.dev
 OTP_EXPIRY_MINUTES=5
 ```

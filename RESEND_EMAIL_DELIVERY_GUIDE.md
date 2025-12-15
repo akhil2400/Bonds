@@ -9,13 +9,13 @@ Your Resend email service is working correctly! The OTP emails are being sent su
 ### **Testing Mode (Active)**
 - ✅ **Status**: Working
 - ✅ **Sender**: `onboarding@resend.dev`
-- ✅ **Recipient**: `bondforever44@gmail.com` (account owner only)
+- ✅ **Recipient**: `account-owner@example.com` (account owner only)
 - ✅ **API Key**: Valid and working
 - ✅ **Message ID**: `c519d488-91ad-4ea0-a870-d686ad939ec8`
 
 ### **Environment Variables**
 ```env
-RESEND_API_KEY=re_N3wSfnzY_MifuVr1npG2g5jAcwtJUjVXX
+RESEND_API_KEY=your-resend-api-key
 EMAIL_FROM=onboarding@resend.dev
 ```
 
