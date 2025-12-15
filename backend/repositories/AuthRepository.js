@@ -1,40 +1,41 @@
 const User = require('../models/User');
+const { withDatabaseErrorHandling } = require('../middlewares/databaseCheck');
 
 class AuthRepository {
   async findByEmail(email) {
-    return await User.findOne({ email });
+    return await withDatabaseErrorHandling(() => User.findOne({ email }))();
   }
 
   async findByMobile(mobile) {
-    return await User.findOne({ mobile });
+    return await withDatabaseErrorHandling(() => User.findOne({ mobile }))();
   }
 
   async findById(id) {
-    return await User.findById(id);
+    return await withDatabaseErrorHandling(() => User.findById(id))();
   }
 
   async findAll() {
-    return await User.find({}).select('-password').sort({ createdAt: -1 });
+    return await withDatabaseErrorHandling(() => User.find({}).select('-password').sort({ createdAt: -1 }))();
   }
 
   async createUser(data) {
-    return await User.create(data);
+    return await withDatabaseErrorHandling(() => User.create(data))();
   }
 
   async updateById(id, data) {
-    return await User.findByIdAndUpdate(id, data, { new: true }).select('-password');
+    return await withDatabaseErrorHandling(() => User.findByIdAndUpdate(id, data, { new: true }).select('-password'))();
   }
 
   async deleteById(id) {
-    return await User.findByIdAndDelete(id);
+    return await withDatabaseErrorHandling(() => User.findByIdAndDelete(id))();
   }
 
   async findTrustedMembers() {
-    return await User.find({ isTrustedMember: true }).select('-password');
+    return await withDatabaseErrorHandling(() => User.find({ isTrustedMember: true }).select('-password'))();
   }
 
   async countByRole(role) {
-    return await User.countDocuments({ role });
+    return await withDatabaseErrorHandling(() => User.countDocuments({ role }))();
   }
 }
 

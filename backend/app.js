@@ -3,6 +3,7 @@ const cookieParser = require('cookie-parser');
 
 const security = require('./middlewares/security');
 const errorHandler = require('./middlewares/errorHandler');
+const { checkDatabaseConnection } = require('./middlewares/databaseCheck');
 
 const app = express();
 
@@ -22,18 +23,43 @@ app.use(cookieParser());
 
 // Health check
 app.get('/health', (req, res) => {
-  res.status(200).json({ status: 'OK' });
+  const mongoose = require('mongoose');
+  
+  const health = {
+    status: 'OK',
+    timestamp: new Date().toISOString(),
+    services: {
+      server: 'running',
+      database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
+      email: 'configured'
+    },
+    environment: process.env.NODE_ENV || 'development'
+  };
+
+  // Return 503 if database is down but server is up
+  const statusCode = health.services.database === 'connected' ? 200 : 503;
+  
+  res.status(statusCode).json(health);
+});
+
+// Simple test endpoint that doesn't require database
+app.get('/api/test', (req, res) => {
+  res.json({
+    success: true,
+    message: 'API server is working!',
+    timestamp: new Date().toISOString()
+  });
 });
 
 // Routes
-app.use('/api/auth', security.authRateLimit, require('./routes/auth'));
-app.use('/api/users', require('./routes/userManagement'));
-app.use('/api/memory', require('./routes/memory'));
-app.use('/api/timeline', require('./routes/timeline'));
-app.use('/api/thought', require('./routes/thought'));
-app.use('/api/trip', require('./routes/trip'));
-app.use('/api/music', require('./routes/music'));
-app.use('/api/comment', require('./routes/comment'));
+app.use('/api/auth', security.authRateLimit, checkDatabaseConnection, require('./routes/auth'));
+app.use('/api/users', checkDatabaseConnection, require('./routes/userManagement'));
+app.use('/api/memory', checkDatabaseConnection, require('./routes/memory'));
+app.use('/api/timeline', checkDatabaseConnection, require('./routes/timeline'));
+app.use('/api/thought', checkDatabaseConnection, require('./routes/thought'));
+app.use('/api/trip', checkDatabaseConnection, require('./routes/trip'));
+app.use('/api/music', checkDatabaseConnection, require('./routes/music'));
+app.use('/api/comment', checkDatabaseConnection, require('./routes/comment'));
 
 // Error handling middleware (must be last)
 app.use(errorHandler);

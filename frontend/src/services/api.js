@@ -45,6 +45,14 @@ api.interceptors.response.use(
           // Server error
           console.error('Server error:', data.error);
           break;
+        case 503:
+          // Service unavailable (database down)
+          console.error('Database unavailable:', data.error);
+          if (data.code === 'DATABASE_UNAVAILABLE') {
+            // Show user-friendly message for database issues
+            console.log('Database troubleshooting:', data.troubleshooting);
+          }
+          break;
         default:
           console.error('API Error:', data.error || 'Unknown error');
       }
