@@ -25,12 +25,15 @@ const auth = async (req, res, next) => {
       throw new CustomError('Account is deactivated', 401);
     }
 
-    // Attach user to request
+    // Attach user to request with all necessary fields for authorization
     req.user = {
       id: user._id,
       name: user.name,
       email: user.email,
-      role: user.role
+      role: user.role,
+      isTrustedMember: user.isTrustedMember,
+      isActive: user.isActive,
+      isVerified: user.isVerified
     };
 
     next();

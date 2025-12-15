@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
+import { PermissionProvider } from './context/PermissionContext';
 import ProtectedRoute from './components/common/ProtectedRoute';
 import Layout from './components/layout/Layout';
 import Landing from './pages/Landing';
@@ -15,7 +16,8 @@ import Music from './pages/Music';
 function App() {
   return (
     <AuthProvider>
-      <Router>
+      <PermissionProvider>
+        <Router>
         <Routes>
           <Route path="/" element={<Landing />} />
           <Route path="/login" element={<Login />} />
@@ -64,7 +66,8 @@ function App() {
             </ProtectedRoute>
           } />
         </Routes>
-      </Router>
+        </Router>
+      </PermissionProvider>
     </AuthProvider>
   );
 }

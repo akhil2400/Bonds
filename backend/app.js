@@ -27,6 +27,7 @@ app.get('/health', (req, res) => {
 
 // Routes
 app.use('/api/auth', security.authRateLimit, require('./routes/auth'));
+app.use('/api/users', require('./routes/userManagement'));
 app.use('/api/memory', require('./routes/memory'));
 app.use('/api/timeline', require('./routes/timeline'));
 app.use('/api/thought', require('./routes/thought'));

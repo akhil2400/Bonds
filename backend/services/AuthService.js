@@ -37,14 +37,20 @@ class AuthService {
     // Hash password
     const hashedPassword = await this.hashPassword(password);
 
-    // Create user
+    // Determine user role and trusted status based on email
+    const { TRUSTED_MEMBER_EMAILS } = require('../middlewares/authorization');
+    const isTrustedEmail = email && TRUSTED_MEMBER_EMAILS.includes(email.toLowerCase());
+    
+    // Create user with appropriate role
     const user = await AuthRepository.createUser({
       name,
       email,
       mobile,
       password: hashedPassword,
       isVerified,
-      verificationMethod: mobile ? 'mobile' : 'email'
+      verificationMethod: mobile ? 'mobile' : 'email',
+      role: isTrustedEmail ? 'member' : 'viewer', // Trusted emails get member role
+      isTrustedMember: isTrustedEmail // Mark as trusted if in the list
     });
 
     // Generate tokens
@@ -57,6 +63,7 @@ class AuthService {
         email: user.email,
         mobile: user.mobile,
         role: user.role,
+        isTrustedMember: user.isTrustedMember,
         isVerified: user.isVerified
       },
       accessToken,
@@ -90,7 +97,8 @@ class AuthService {
         id: user._id,
         name: user.name,
         email: user.email,
-        role: user.role
+        role: user.role,
+        isTrustedMember: user.isTrustedMember
       },
       accessToken,
       refreshToken

@@ -24,8 +24,13 @@ const userSchema = new mongoose.Schema({
   },
   role: {
     type: String,
-    enum: ['admin', 'member'],
-    default: 'member'
+    enum: ['admin', 'member', 'viewer'],
+    default: 'viewer' // New users are viewers by default
+  },
+  isTrustedMember: {
+    type: Boolean,
+    default: false, // Only the 4 trusted friends will have this set to true
+    index: true
   },
   isActive: {
     type: Boolean,

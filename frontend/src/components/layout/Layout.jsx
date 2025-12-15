@@ -1,9 +1,13 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { usePermissions } from '../../context/PermissionContext';
+import PermissionGate from '../common/PermissionGate';
+import RoleBadge from '../common/RoleBadge';
 import './Layout.css';
 
 const Layout = ({ children }) => {
   const { user, logout } = useAuth();
+  const { canCreate, isTrustedMember } = usePermissions();
   const navigate = useNavigate();
 
   const handleLogout = async () => {
@@ -30,9 +34,12 @@ const Layout = ({ children }) => {
 
             {/* User Info & Logout */}
             <div className="user-section">
-              <span className="user-greeting">
-                Hello, {user?.name}
-              </span>
+              <div className="user-info">
+                <span className="user-greeting">
+                  Hello, {user?.name}
+                </span>
+                <RoleBadge size="small" />
+              </div>
               <button
                 onClick={handleLogout}
                 className="logout-btn"
