@@ -28,7 +28,7 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    const { response } = error;
+    const { response, config } = error;
     
     if (response) {
       // Server responded with error status
@@ -36,8 +36,11 @@ api.interceptors.response.use(
       
       switch (status) {
         case 401:
-          // Unauthorized - only redirect if not on public pages
-          if (!window.location.pathname.includes('/login') && 
+          // Unauthorized - clear token but don't redirect during auth check
+          localStorage.removeItem('authToken');
+          // Only redirect if this is not an auth check request
+          if (!config.url?.includes('/auth/me') && 
+              !window.location.pathname.includes('/login') && 
               !window.location.pathname.includes('/register') && 
               window.location.pathname !== '/') {
             window.location.href = '/login';

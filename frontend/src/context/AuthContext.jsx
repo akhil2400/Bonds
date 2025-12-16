@@ -38,10 +38,19 @@ export const AuthProvider = ({ children }) => {
   const checkAuthStatus = async () => {
     try {
       dispatch({ type: 'SET_LOADING', payload: true });
+      
+      // Check if we have a token first
+      const token = localStorage.getItem('authToken');
+      if (!token) {
+        dispatch({ type: 'CLEAR_USER' });
+        return;
+      }
+      
       const response = await authService.checkAuth();
       dispatch({ type: 'SET_USER', payload: response.user });
     } catch (error) {
-      // Silently clear user - this is expected for new users
+      // If auth check fails, clear the invalid token and user
+      localStorage.removeItem('authToken');
       dispatch({ type: 'CLEAR_USER' });
     }
   };

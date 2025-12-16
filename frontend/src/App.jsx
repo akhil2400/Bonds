@@ -69,6 +69,8 @@ function App() {
               </Layout>
             </ProtectedRoute>
           } />
+          {/* Catch-all route - redirect unknown paths to dashboard if authenticated, otherwise to landing */}
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
         </Router>
       </PermissionProvider>
