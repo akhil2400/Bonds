@@ -1,13 +1,12 @@
 import axios from 'axios';
+import API_CONFIG from '../config/api.js';
 
-// Create axios instance with base configuration
+// Create axios instance with production configuration
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api',
-  withCredentials: true,
-  timeout: 10000,
-  headers: {
-    'Content-Type': 'application/json',
-  },
+  baseURL: API_CONFIG.BASE_URL,
+  withCredentials: API_CONFIG.WITH_CREDENTIALS,
+  timeout: API_CONFIG.TIMEOUT,
+  headers: API_CONFIG.DEFAULT_HEADERS,
 });
 
 // Request interceptor to add auth token if available

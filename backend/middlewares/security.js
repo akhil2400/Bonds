@@ -45,39 +45,50 @@ const authRateLimitConfig = rateLimit({
   legacyHeaders: false
 });
 
-// CORS configuration
+// CORS configuration for production
 const corsConfig = cors({
   origin: function (origin, callback) {
+    // Production frontend URL
+    const PRODUCTION_FRONTEND = 'https://bonds-one.vercel.app';
+    
     const allowedOrigins = [
       process.env.CLIENT_URL,
-      // Local development
-      'http://localhost:3000',
-      'http://localhost:3001',
-      'http://localhost:5173',
-      'http://localhost:5174',
-      'http://localhost:5175',
-      'http://localhost:5176',
-      'http://localhost:5177',
-      // Network access for mobile devices
-      'http://192.168.18.210:5173',
-      'http://192.168.18.210:5174',
-      'http://192.168.18.210:5175',
-      'http://192.168.18.210:5176',
-      'http://192.168.56.1:5173',
-      'http://192.168.56.1:5174',
-      'http://192.168.56.1:5175',
-      'http://192.168.56.1:5176'
+      PRODUCTION_FRONTEND,
+      // Local development (only in development mode)
+      ...(process.env.NODE_ENV === 'development' ? [
+        'http://localhost:3000',
+        'http://localhost:3001',
+        'http://localhost:5173',
+        'http://localhost:5174',
+        'http://localhost:5175',
+        'http://localhost:5176',
+        'http://localhost:5177',
+        // Network access for mobile devices
+        'http://192.168.18.210:5173',
+        'http://192.168.18.210:5174',
+        'http://192.168.18.210:5175',
+        'http://192.168.18.210:5176',
+        'http://192.168.56.1:5173',
+        'http://192.168.56.1:5174',
+        'http://192.168.56.1:5175',
+        'http://192.168.56.1:5176'
+      ] : [])
     ].filter(Boolean); // Remove undefined values
     
-    // Allow requests with no origin (mobile apps, etc.) in development
+    // Allow requests with no origin (mobile apps, etc.) in development only
     if (!origin && process.env.NODE_ENV === 'development') {
       return callback(null, true);
     }
     
-    // In production, also allow Vercel preview URLs
+    // In production, allow specific Vercel URLs only
     if (process.env.NODE_ENV === 'production' && origin) {
-      // Allow Vercel deployment URLs (*.vercel.app)
-      if (origin.endsWith('.vercel.app')) {
+      // Allow main production URL
+      if (origin === PRODUCTION_FRONTEND) {
+        return callback(null, true);
+      }
+      
+      // Allow Vercel preview URLs (*.vercel.app) for staging
+      if (origin.endsWith('.vercel.app') && origin.includes('bonds')) {
         return callback(null, true);
       }
     }
@@ -85,7 +96,8 @@ const corsConfig = cors({
     if (allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
-      console.log('CORS blocked origin:', origin);
+      console.log('🚫 CORS blocked origin:', origin);
+      console.log('✅ Allowed origins:', allowedOrigins);
       callback(new Error('Not allowed by CORS'));
     }
   },
@@ -96,7 +108,9 @@ const corsConfig = cors({
     'Authorization', 
     'X-Requested-With',
     'Accept',
-    'Origin'
+    'Origin',
+    'X-Forwarded-For',
+    'X-Real-IP'
   ],
   exposedHeaders: ['Set-Cookie'],
   optionsSuccessStatus: 200,
