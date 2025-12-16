@@ -2,7 +2,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { AuthProvider } from './context/AuthContext';
 import { PermissionProvider } from './context/PermissionContext';
 // Import connection test for development
-// import './utils/connectionTest.js'; // Temporarily disabled for debugging
+import './utils/connectionTest.js';
 import ErrorBoundary from './components/common/ErrorBoundary';
 import ProtectedRoute from './components/common/ProtectedRoute';
 import Layout from './components/layout/Layout';
@@ -17,7 +17,6 @@ import Thoughts from './pages/Thoughts';
 import Trips from './pages/Trips';
 import Music from './pages/Music';
 import NotFound from './pages/NotFound';
-import TestNotFound from './pages/TestNotFound';
 
 function App() {
   return (
@@ -73,11 +72,8 @@ function App() {
               </Layout>
             </ProtectedRoute>
           } />
-          {/* Test routes for debugging */}
-          <Route path="/test-404" element={<TestNotFound />} />
-          <Route path="/test-notfound" element={<NotFound />} />
           {/* 404 Not Found route */}
-          <Route path="*" element={<TestNotFound />} />
+          <Route path="*" element={<NotFound />} />
           </Routes>
           </Router>
         </PermissionProvider>
