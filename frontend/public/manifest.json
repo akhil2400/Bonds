@@ -1,0 +1,27 @@
+{
+  "name": "BONDS - Friendship Memories",
+  "short_name": "BONDS",
+  "description": "Where friendships live forever - A place to celebrate and preserve your most treasured friendship memories",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#1b1b1e",
+  "theme_color": "#faa916",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/bondReal.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/bondReal.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["social", "lifestyle", "photo"],
+  "lang": "en",
+  "dir": "ltr"
+}
