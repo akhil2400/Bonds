@@ -74,7 +74,7 @@ class MailerService {
           throw new Error('EMAIL_USER and EMAIL_PASS must be configured');
         }
         
-        this.transporter = nodemailer.createTransporter({
+        this.transporter = nodemailer.createTransport({
           host: 'smtp.gmail.com',
           port: 587,
           secure: false,
@@ -138,7 +138,7 @@ class MailerService {
           throw new Error('EMAIL_USER and EMAIL_PASS must be configured');
         }
         
-        this.transporter = nodemailer.createTransporter({
+        this.transporter = nodemailer.createTransport({
           host: 'smtp.gmail.com',
           port: 587,
           secure: false,
