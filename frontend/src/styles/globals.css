@@ -97,7 +97,7 @@ html {
 }
 
 body {
-  font-family: var(--font-family-script);
+  font-family: 'Louisville Script W07 Bold It', 'Louisville Script Bold', var(--font-family-script);
   font-size: var(--font-size-base);
   font-weight: var(--font-weight-normal);
   line-height: var(--line-height-normal);

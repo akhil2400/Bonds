@@ -5,7 +5,7 @@
   flex-direction: column;
   position: relative;
   overflow-x: hidden;
-  font-family: 'Louisville Script Bold', cursive;
+  font-family: 'Louisville Script W07 Bold It', 'Louisville Script Bold', cursive;
 }
 
 /* Hero Cover Section */
@@ -163,7 +163,7 @@
   font-size: 0.95rem;
   color: white;
   font-weight: 600;
-  font-family: 'Louisville Script Bold', cursive;
+  font-family: 'Louisville Script W07 Bold It', 'Louisville Script Bold', cursive;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
   animation: badgeFloat 3s ease-in-out infinite;
 }
@@ -188,7 +188,7 @@
   font-size: 8rem;
   font-weight: bold;
   color: white;
-  font-family: 'Louisville Script Bold', cursive;
+  font-family: 'Louisville Script W07 Bold It', 'Louisville Script Bold', cursive;
   text-shadow: 
     0 2px 4px rgba(0, 0, 0, 0.3),
     0 4px 8px rgba(0, 0, 0, 0.2),
@@ -218,7 +218,7 @@
 .hero-tagline {
   font-size: 1.5rem;
   color: rgba(255, 255, 255, 0.9);
-  font-family: 'Louisville Script Bold', cursive;
+  font-family: 'Louisville Script W07 Bold It', 'Louisville Script Bold', cursive;
   font-weight: 500;
   margin: 0.5rem 0 1rem 0;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
@@ -229,7 +229,7 @@
 .hero-subtitle {
   font-size: 1.1rem;
   color: white;
-  font-family: 'Louisville Script Bold', cursive;
+  font-family: 'Louisville Script W07 Bold It', 'Louisville Script Bold', cursive;
   font-weight: 400;
   margin: 0 0 2rem 0;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
@@ -264,7 +264,7 @@
   text-decoration: none;
   border-radius: 2rem;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  font-family: 'Louisville Script Bold', cursive;
+  font-family: 'Louisville Script W07 Bold It', 'Louisville Script Bold', cursive;
   position: relative;
   overflow: hidden;
   border: 2px solid transparent;
@@ -368,13 +368,13 @@
   font-weight: bold;
   color: #1b1b1e;
   margin-bottom: 1rem;
-  font-family: 'Louisville Script Bold', cursive;
+  font-family: 'Louisville Script W07 Bold It', 'Louisville Script Bold', cursive;
 }
 
 .section-subtitle {
   font-size: 1.3rem;
   color: #6d676e;
-  font-family: 'Louisville Script Bold', cursive;
+  font-family: 'Louisville Script W07 Bold It', 'Louisville Script Bold', cursive;
   margin: 0;
 }
 
@@ -424,7 +424,7 @@
   font-size: 1.8rem;
   margin-bottom: 1rem;
   color: #1b1b1e;
-  font-family: 'Louisville Script Bold', cursive;
+  font-family: 'Louisville Script W07 Bold It', 'Louisville Script Bold', cursive;
   font-weight: 600;
 }
 
@@ -433,7 +433,7 @@
   color: #6d676e;
   line-height: 1.7;
   margin: 0;
-  font-family: 'Louisville Script Bold', cursive;
+  font-family: 'Louisville Script W07 Bold It', 'Louisville Script Bold', cursive;
 }
 
 .feature-accent {
@@ -492,7 +492,7 @@
   margin-bottom: 1.5rem;
   position: relative;
   z-index: 1;
-  font-family: 'Louisville Script Bold', cursive;
+  font-family: 'Louisville Script W07 Bold It', 'Louisville Script Bold', cursive;
   line-height: 1.6;
 }
 
@@ -520,7 +520,7 @@
   font-weight: 600;
   color: #1b1b1e;
   display: block;
-  font-family: 'Louisville Script Bold', cursive;
+  font-family: 'Louisville Script W07 Bold It', 'Louisville Script Bold', cursive;
   font-size: 1.1rem;
 }
 
@@ -528,7 +528,7 @@
   font-size: 0.9rem;
   color: #6d676e;
   display: block;
-  font-family: 'Louisville Script Bold', cursive;
+  font-family: 'Louisville Script W07 Bold It', 'Louisville Script Bold', cursive;
 }
 
 /* Elegant Footer */
@@ -550,7 +550,7 @@
   font-size: 2.5rem;
   color: #1b1b1e;
   margin-bottom: 0.5rem;
-  font-family: 'Louisville Script Bold', cursive;
+  font-family: 'Louisville Script W07 Bold It', 'Louisville Script Bold', cursive;
   background: linear-gradient(135deg, #faa916 0%, #e8970f 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -560,7 +560,7 @@
 .footer-brand p {
   color: #6d676e;
   margin: 0;
-  font-family: 'Louisville Script Bold', cursive;
+  font-family: 'Louisville Script W07 Bold It', 'Louisville Script Bold', cursive;
 }
 
 .footer-links {
@@ -571,7 +571,7 @@
 .footer-links a {
   color: #6d676e;
   text-decoration: none;
-  font-family: 'Louisville Script Bold', cursive;
+  font-family: 'Louisville Script W07 Bold It', 'Louisville Script Bold', cursive;
   transition: color 0.3s ease;
   font-weight: 500;
 }
@@ -589,7 +589,7 @@
 .footer-bottom p {
   color: #6d676e;
   margin: 0;
-  font-family: 'Louisville Script Bold', cursive;
+  font-family: 'Louisville Script W07 Bold It', 'Louisville Script Bold', cursive;
   font-size: 1.05rem;
 }
 
