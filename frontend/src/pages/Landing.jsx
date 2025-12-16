@@ -12,10 +12,17 @@ const Landing = () => {
       <section className="hero-cover-section">
         <div className="hero-cover-image">
           <img
-            src="/us.jpeg"
+            src="/us.jpeg?v=2"
             alt="Our friendship journey - 12 years of memories"
             className="cover-photo"
             loading="eager"
+            onError={(e) => {
+              console.error('Cover image failed to load:', e.target.src);
+              e.target.style.display = 'none';
+            }}
+            onLoad={() => {
+              console.log('Cover image loaded successfully');
+            }}
           />
           <div className="hero-overlay"></div>
         </div>
