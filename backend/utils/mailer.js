@@ -18,29 +18,35 @@ class MailerService {
         throw new Error('EMAIL_USER and EMAIL_PASS must be configured in environment variables');
       }
 
-      // Create Nodemailer transporter with Gmail SMTP
+      // Create Nodemailer transporter with Gmail SMTP - Render optimized
       this.transporter = nodemailer.createTransport({
-        service: 'gmail',
+        host: 'smtp.gmail.com',
+        port: 587,
+        secure: false, // Use STARTTLS
         auth: {
           user: emailUser,
           pass: emailPass // Gmail App Password
         },
-        // Add timeout and connection settings for Render
-        connectionTimeout: 10000, // 10 seconds
-        greetingTimeout: 5000,    // 5 seconds
-        socketTimeout: 10000,     // 10 seconds
-        // Render-specific settings
-        pool: true,
-        maxConnections: 1,
-        maxMessages: 3,
-        rateDelta: 20000,
-        rateLimit: 5
+        // Render-optimized settings
+        connectionTimeout: 30000,  // 30 seconds for slow connections
+        greetingTimeout: 10000,    // 10 seconds
+        socketTimeout: 30000,      // 30 seconds
+        // Connection pooling disabled for better reliability
+        pool: false,
+        // TLS settings for better compatibility
+        tls: {
+          ciphers: 'SSLv3',
+          rejectUnauthorized: false
+        },
+        // Debug for troubleshooting
+        debug: process.env.NODE_ENV === 'development',
+        logger: process.env.NODE_ENV === 'development'
       });
 
-      // Verify connection with timeout
+      // Verify connection with longer timeout for Render
       const verifyPromise = this.transporter.verify();
       const timeoutPromise = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('Connection timeout')), 8000)
+        setTimeout(() => reject(new Error('Gmail SMTP connection timeout - this is normal on Render free tier')), 15000)
       );
       
       await Promise.race([verifyPromise, timeoutPromise]);
@@ -55,7 +61,30 @@ class MailerService {
 
   async sendOTP(email, otp, userName = 'Friend') {
     try {
-      await this.initialize();
+      // Try to initialize, but don't fail if verification times out
+      try {
+        await this.initialize();
+      } catch (initError) {
+        console.log('⚠️ Email service verification failed, attempting direct send...');
+        // Create transporter without verification for Render compatibility
+        const emailUser = process.env.EMAIL_USER;
+        const emailPass = process.env.EMAIL_PASS;
+        
+        if (!emailUser || !emailPass) {
+          throw new Error('EMAIL_USER and EMAIL_PASS must be configured');
+        }
+        
+        this.transporter = nodemailer.createTransporter({
+          host: 'smtp.gmail.com',
+          port: 587,
+          secure: false,
+          auth: { user: emailUser, pass: emailPass },
+          connectionTimeout: 30000,
+          socketTimeout: 30000,
+          pool: false,
+          tls: { rejectUnauthorized: false }
+        });
+      }
 
       const expiryMinutes = process.env.OTP_EXPIRY_MINUTES || 5;
       const emailContent = this.generateOTPEmailContent(otp, userName, expiryMinutes);
@@ -96,7 +125,30 @@ class MailerService {
 
   async sendPasswordResetOTP(email, otp, userName = 'Friend') {
     try {
-      await this.initialize();
+      // Try to initialize, but don't fail if verification times out
+      try {
+        await this.initialize();
+      } catch (initError) {
+        console.log('⚠️ Email service verification failed, attempting direct send...');
+        // Create transporter without verification for Render compatibility
+        const emailUser = process.env.EMAIL_USER;
+        const emailPass = process.env.EMAIL_PASS;
+        
+        if (!emailUser || !emailPass) {
+          throw new Error('EMAIL_USER and EMAIL_PASS must be configured');
+        }
+        
+        this.transporter = nodemailer.createTransporter({
+          host: 'smtp.gmail.com',
+          port: 587,
+          secure: false,
+          auth: { user: emailUser, pass: emailPass },
+          connectionTimeout: 30000,
+          socketTimeout: 30000,
+          pool: false,
+          tls: { rejectUnauthorized: false }
+        });
+      }
 
       const expiryMinutes = process.env.OTP_EXPIRY_MINUTES || 5;
       const emailContent = this.generatePasswordResetEmailContent(otp, userName, expiryMinutes);
