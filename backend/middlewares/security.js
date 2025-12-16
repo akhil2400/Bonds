@@ -75,31 +75,30 @@ const corsConfig = cors({
       ] : [])
     ].filter(Boolean); // Remove undefined values
     
-    // Allow requests with no origin (mobile apps, etc.) in development only
-    if (!origin && process.env.NODE_ENV === 'development') {
+    // 🔧 PRODUCTION FIX: Allow requests without origin (Render health checks, server calls)
+    if (!origin) {
+      console.log('✅ CORS: Allowing request without origin (health check/server call)');
       return callback(null, true);
     }
     
-    // In production, allow specific Vercel URLs only
-    if (process.env.NODE_ENV === 'production' && origin) {
-      // Allow main production URL
-      if (origin === PRODUCTION_FRONTEND) {
-        return callback(null, true);
-      }
-      
-      // Allow Vercel preview URLs (*.vercel.app) for staging
+    // Check if origin is in allowed list
+    if (allowedOrigins.includes(origin)) {
+      console.log('✅ CORS: Allowing origin:', origin);
+      return callback(null, true);
+    }
+    
+    // In production, also allow Vercel preview URLs for staging
+    if (process.env.NODE_ENV === 'production') {
       if (origin.endsWith('.vercel.app') && origin.includes('bonds')) {
+        console.log('✅ CORS: Allowing Vercel preview URL:', origin);
         return callback(null, true);
       }
     }
     
-    if (allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      console.log('🚫 CORS blocked origin:', origin);
-      console.log('✅ Allowed origins:', allowedOrigins);
-      callback(new Error('Not allowed by CORS'));
-    }
+    // Block all other origins
+    console.log('🚫 CORS blocked origin:', origin);
+    console.log('✅ Allowed origins:', allowedOrigins);
+    callback(new Error('Not allowed by CORS'));
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
