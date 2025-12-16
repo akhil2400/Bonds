@@ -4,6 +4,10 @@ import './NotFound.css';
 
 const NotFound = () => {
   const { isAuthenticated } = useAuth();
+  
+  // Debug logging
+  console.log('NotFound component rendered, isAuthenticated:', isAuthenticated);
+  console.log('Current pathname:', window.location.pathname);
 
   return (
     <div className="not-found-container">
