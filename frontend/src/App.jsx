@@ -3,6 +3,7 @@ import { AuthProvider } from './context/AuthContext';
 import { PermissionProvider } from './context/PermissionContext';
 // Import connection test for development
 import './utils/connectionTest.js';
+import ErrorBoundary from './components/common/ErrorBoundary';
 import ProtectedRoute from './components/common/ProtectedRoute';
 import Layout from './components/layout/Layout';
 import Landing from './pages/Landing';
@@ -15,12 +16,14 @@ import Memories from './pages/Memories';
 import Thoughts from './pages/Thoughts';
 import Trips from './pages/Trips';
 import Music from './pages/Music';
+import NotFound from './pages/NotFound';
 
 function App() {
   return (
-    <AuthProvider>
-      <PermissionProvider>
-        <Router>
+    <ErrorBoundary>
+      <AuthProvider>
+        <PermissionProvider>
+          <Router>
         <Routes>
           <Route path="/" element={<Landing />} />
           <Route path="/login" element={<Login />} />
@@ -69,12 +72,13 @@ function App() {
               </Layout>
             </ProtectedRoute>
           } />
-          {/* Catch-all route - redirect unknown paths to dashboard if authenticated, otherwise to landing */}
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-        </Router>
-      </PermissionProvider>
-    </AuthProvider>
+          {/* 404 Not Found route */}
+          <Route path="*" element={<NotFound />} />
+          </Routes>
+          </Router>
+        </PermissionProvider>
+      </AuthProvider>
+    </ErrorBoundary>
   );
 }
 
