@@ -24,11 +24,26 @@ class MailerService {
         auth: {
           user: emailUser,
           pass: emailPass // Gmail App Password
-        }
+        },
+        // Add timeout and connection settings for Render
+        connectionTimeout: 10000, // 10 seconds
+        greetingTimeout: 5000,    // 5 seconds
+        socketTimeout: 10000,     // 10 seconds
+        // Render-specific settings
+        pool: true,
+        maxConnections: 1,
+        maxMessages: 3,
+        rateDelta: 20000,
+        rateLimit: 5
       });
 
-      // Verify connection
-      await this.transporter.verify();
+      // Verify connection with timeout
+      const verifyPromise = this.transporter.verify();
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Connection timeout')), 8000)
+      );
+      
+      await Promise.race([verifyPromise, timeoutPromise]);
       this.initialized = true;
       
       console.log('✅ Nodemailer service initialized successfully');

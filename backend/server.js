@@ -59,8 +59,20 @@ const startServer = async () => {
     console.log('');
     console.log('📧 Step 3: Email Service Initialization');
     try {
-      await MailerService.verifyConnection();
-      console.log('✅ Nodemailer service ready');
+      // Don't block server startup for email service
+      const emailVerification = MailerService.verifyConnection();
+      const emailTimeout = new Promise((resolve) => 
+        setTimeout(() => resolve(false), 5000)
+      );
+      
+      const emailReady = await Promise.race([emailVerification, emailTimeout]);
+      
+      if (emailReady) {
+        console.log('✅ Nodemailer service ready');
+      } else {
+        console.log('⚠️  Email service initialization timeout - will retry on first use');
+        console.log('💡 This is normal on Render free tier - emails will work when needed');
+      }
     } catch (error) {
       console.log('⚠️  Email service will be initialized on first use');
       console.log('💡 Make sure EMAIL_USER and EMAIL_PASS are configured in .env');
