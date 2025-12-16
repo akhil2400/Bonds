@@ -61,6 +61,46 @@ app.get('/api/test', (req, res) => {
   });
 });
 
+// Email service test endpoint
+app.get('/api/test-email', async (req, res) => {
+  try {
+    const MailerService = require('./utils/mailer');
+    
+    // Check environment variables
+    const emailConfig = {
+      EMAIL_USER: process.env.EMAIL_USER ? 'configured' : 'missing',
+      EMAIL_PASS: process.env.EMAIL_PASS ? 'configured' : 'missing'
+    };
+    
+    // Try to initialize email service
+    let emailStatus = 'not_initialized';
+    let emailError = null;
+    
+    try {
+      await MailerService.initialize();
+      emailStatus = 'initialized';
+    } catch (error) {
+      emailStatus = 'failed';
+      emailError = error.message;
+    }
+    
+    res.json({
+      success: true,
+      message: 'Email service test',
+      config: emailConfig,
+      status: emailStatus,
+      error: emailError,
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: error.message,
+      timestamp: new Date().toISOString()
+    });
+  }
+});
+
 // Routes
 app.use('/api/auth', security.authRateLimit, checkDatabaseConnection, require('./routes/auth'));
 app.use('/api/users', checkDatabaseConnection, require('./routes/userManagement'));
