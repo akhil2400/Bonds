@@ -9,7 +9,7 @@
   border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 2rem;
   color: white;
-  font-family: 'Louisville Script Bold', cursive;
+  font-family: 'Louisville Script W07 Bold It', 'Louisville Script Bold', cursive;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
   animation: counterFloat 3s ease-in-out infinite;
   min-width: 280px;

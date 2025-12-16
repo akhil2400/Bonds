@@ -2,7 +2,7 @@
 .layout {
   min-height: 100vh;
   background: linear-gradient(135deg, #fbfffe 0%, #f8f9fa 100%);
-  font-family: 'Louisville Script Bold', cursive;
+  font-family: 'Louisville Script W07 Bold It', 'Louisville Script Bold', cursive;
 }
 
 /* Header Styling */
@@ -40,7 +40,7 @@
   font-size: 2.2rem;
   font-weight: bold;
   color: #fbfffe;
-  font-family: 'Louisville Script Bold', cursive;
+  font-family: 'Louisville Script W07 Bold It', 'Louisville Script Bold', cursive;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
   letter-spacing: 2px;
   position: relative;
@@ -80,7 +80,7 @@
   font-size: 1.1rem;
   font-weight: 600;
   color: #fbfffe;
-  font-family: 'Louisville Script Bold', cursive;
+  font-family: 'Louisville Script W07 Bold It', 'Louisville Script Bold', cursive;
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
   line-height: 1;
 }
@@ -108,7 +108,7 @@
   font-size: 1.1rem;
   font-weight: bold;
   color: #1b1b1e;
-  font-family: 'Louisville Script Bold', cursive;
+  font-family: 'Louisville Script W07 Bold It', 'Louisville Script Bold', cursive;
 }
 
 .logout-btn {
@@ -166,7 +166,7 @@
   border-radius: 2rem;
   transition: all 0.3s ease;
   white-space: nowrap;
-  font-family: 'Louisville Script Bold', cursive;
+  font-family: 'Louisville Script W07 Bold It', 'Louisville Script Bold', cursive;
   border: 2px solid transparent;
 }
 

@@ -34,7 +34,7 @@
   color: #1b1b1e;
   font-weight: 600;
   font-size: 0.9rem;
-  font-family: 'Louisville Script Bold', cursive;
+  font-family: 'Louisville Script W07 Bold It', 'Louisville Script Bold', cursive;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
@@ -44,7 +44,7 @@
   font-weight: bold;
   color: #1b1b1e;
   margin-bottom: 1.5rem;
-  font-family: 'Louisville Script Bold', cursive;
+  font-family: 'Louisville Script W07 Bold It', 'Louisville Script Bold', cursive;
   line-height: 1.2;
 }
 
@@ -59,7 +59,7 @@
   max-width: 600px;
   margin: 0 auto;
   line-height: 1.6;
-  font-family: 'Louisville Script Bold', cursive;
+  font-family: 'Louisville Script W07 Bold It', 'Louisville Script Bold', cursive;
 }
 
 /* Hero Decoration - Simplified */
@@ -78,7 +78,7 @@
   color: #1b1b1e;
   text-align: center;
   margin-bottom: 2.5rem;
-  font-family: 'Louisville Script Bold', cursive;
+  font-family: 'Louisville Script W07 Bold It', 'Louisville Script Bold', cursive;
 }
 
 .actions-grid {
@@ -177,7 +177,7 @@
   font-weight: 600;
   color: #1b1b1e;
   margin-bottom: 0.5rem;
-  font-family: 'Louisville Script Bold', cursive;
+  font-family: 'Louisville Script W07 Bold It', 'Louisville Script Bold', cursive;
   line-height: 1.2;
 }
 
@@ -270,7 +270,7 @@
   font-weight: bold;
   color: #1b1b1e;
   margin-bottom: 1rem;
-  font-family: 'Louisville Script Bold', cursive;
+  font-family: 'Louisville Script W07 Bold It', 'Louisville Script Bold', cursive;
   position: relative;
   z-index: 2;
 }
@@ -329,14 +329,14 @@
   line-height: 1.6;
   margin-bottom: 2rem;
   font-style: italic;
-  font-family: 'Louisville Script Bold', cursive;
+  font-family: 'Louisville Script W07 Bold It', 'Louisville Script Bold', cursive;
 }
 
 .quote-author {
   color: #faa916;
   font-weight: 600;
   font-size: 1.1rem;
-  font-family: 'Louisville Script Bold', cursive;
+  font-family: 'Louisville Script W07 Bold It', 'Louisville Script Bold', cursive;
 }
 
 /* Responsive Design */
