@@ -66,17 +66,27 @@ class OTPService {
         attempts: 0
       });
 
-      // Send email using Nodemailer
-      const emailResult = await MailerService.sendOTP(normalizedEmail, plainOTP, userName);
+      // Send email asynchronously (non-blocking for better UX)
+      MailerService.sendOTP(normalizedEmail, plainOTP, userName)
+        .then((emailResult) => {
+          console.log(`✅ OTP email sent successfully to: ${normalizedEmail.replace(/(.{2}).*(@.*)/, '$1***$2')}`);
+          console.log(`📧 Message ID: ${emailResult.messageId}`);
+        })
+        .catch((emailError) => {
+          console.error(`❌ Failed to send OTP email to: ${normalizedEmail.replace(/(.{2}).*(@.*)/, '$1***$2')}`);
+          console.error(`📧 Email error: ${emailError.message}`);
+          // Email failure doesn't block the signup process
+          // User can still verify with the OTP if they receive it
+        });
 
-      console.log(`📧 OTP generated and sent to: ${normalizedEmail.replace(/(.{2}).*(@.*)/, '$1***$2')}`);
+      console.log(`📧 OTP generated for: ${normalizedEmail.replace(/(.{2}).*(@.*)/, '$1***$2')} (email sending in background)`);
 
       return {
         success: true,
-        message: 'Verification code sent to your email',
+        message: 'Verification code is being sent to your email',
         otpId: otpRecord._id,
         expiresAt,
-        messageId: emailResult.messageId
+        note: 'Please check your email in a few moments'
       };
 
     } catch (error) {
@@ -209,14 +219,23 @@ class OTPService {
         type: 'password_reset' // Add type to distinguish from signup OTPs
       });
 
-      // Send password reset email using Nodemailer
-      const emailResult = await MailerService.sendPasswordResetOTP(normalizedEmail, plainOTP, userName);
+      // Send password reset email asynchronously (non-blocking)
+      MailerService.sendPasswordResetOTP(normalizedEmail, plainOTP, userName)
+        .then((emailResult) => {
+          console.log(`✅ Password reset email sent successfully to: ${normalizedEmail.replace(/(.{2}).*(@.*)/, '$1***$2')}`);
+          console.log(`📧 Message ID: ${emailResult.messageId}`);
+        })
+        .catch((emailError) => {
+          console.error(`❌ Failed to send password reset email to: ${normalizedEmail.replace(/(.{2}).*(@.*)/, '$1***$2')}`);
+          console.error(`📧 Email error: ${emailError.message}`);
+          // Email failure doesn't block the password reset process
+        });
 
-      console.log(`🔐 Password reset OTP generated and sent to: ${normalizedEmail.replace(/(.{2}).*(@.*)/, '$1***$2')}`);
+      console.log(`🔐 Password reset OTP generated for: ${normalizedEmail.replace(/(.{2}).*(@.*)/, '$1***$2')} (email sending in background)`);
 
       return {
         success: true,
-        message: 'Password reset code sent to your email',
+        message: 'Password reset code is being sent to your email',
         otpId: otpRecord._id,
         expiresAt,
         messageId: emailResult.messageId

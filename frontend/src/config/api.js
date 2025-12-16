@@ -3,8 +3,8 @@ const API_CONFIG = {
   // Base URL for all API requests
   BASE_URL: import.meta.env.VITE_API_BASE_URL || 'https://bonds-backend-rix0.onrender.com/api',
   
-  // Request timeout (10 seconds)
-  TIMEOUT: 10000,
+  // Request timeout (30 seconds for email operations)
+  TIMEOUT: 30000,
   
   // Enable credentials for authentication
   WITH_CREDENTIALS: true,
