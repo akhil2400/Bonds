@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import FriendshipCounter from '../components/common/FriendshipCounter';
 import './Landing.css';
 
 const Landing = () => {
@@ -10,15 +11,15 @@ const Landing = () => {
       {/* Hero Cover Section with Group Photo */}
       <section className="hero-cover-section">
         <div className="hero-cover-image">
-          <img 
-            src="/us.jpeg" 
-            alt="Our friendship journey - 12 years of memories" 
+          <img
+            src="/us.jpeg"
+            alt="Our friendship journey - 12 years of memories"
             className="cover-photo"
             loading="eager"
           />
           <div className="hero-overlay"></div>
         </div>
-        
+
         {/* Navigation Header */}
         <header className="hero-header">
           {isAuthenticated && (
@@ -36,20 +37,15 @@ const Landing = () => {
         {/* Hero Content */}
         <div className="hero-content">
           <div className="hero-text">
-            <div className="hero-badge">
-              <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" />
-              </svg>
-              <span>12 Years of Friendship</span>
-            </div>
-            
+            <FriendshipCounter />
+
             <h1 className="hero-title">
               <span className="brand-name">BONDS</span>
             </h1>
-            
+
             <p className="hero-tagline">Where friendships live forever</p>
-            
-            <p className="hero-subtitle">
+
+            <p className="hero-subtitle" style={{ color: "#ffffff" }}>
               12 years of memories, laughter, and togetherness
             </p>
 
@@ -72,8 +68,8 @@ const Landing = () => {
 
         {/* Scroll Indicator */}
         <div className="scroll-indicator" onClick={() => {
-          document.querySelector('.landing-content')?.scrollIntoView({ 
-            behavior: 'smooth' 
+          document.querySelector('.landing-content')?.scrollIntoView({
+            behavior: 'smooth'
           });
         }}>
           <div className="scroll-arrow">
@@ -94,7 +90,7 @@ const Landing = () => {
               <h3 className="section-title">Why Choose Bonds?</h3>
               <p className="section-subtitle">Everything you need to celebrate friendship</p>
             </div>
-            
+
             <div className="features-grid">
               <div className="feature-card">
                 <div className="feature-icon">
@@ -106,7 +102,7 @@ const Landing = () => {
                 <p>A sacred, private space where your most treasured memories remain safe between you and your closest companions.</p>
                 <div className="feature-accent"></div>
               </div>
-              
+
               <div className="feature-card">
                 <div className="feature-icon">
                   <svg width="40" height="40" fill="currentColor" viewBox="0 0 20 20">
@@ -117,7 +113,7 @@ const Landing = () => {
                 <p>From spontaneous laughter to profound conversations—capture the entire beautiful spectrum of your friendship journey.</p>
                 <div className="feature-accent"></div>
               </div>
-              
+
               <div className="feature-card">
                 <div className="feature-icon">
                   <svg width="40" height="40" fill="currentColor" viewBox="0 0 20 20">
