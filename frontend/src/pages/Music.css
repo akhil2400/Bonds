@@ -14,7 +14,7 @@
 }
 
 .header-content h1 {
-  font-family: 'Louisville Script Bold', cursive;
+  font-family: 'Louisville Script W07 Bold It', 'Louisville Script Bold', cursive;
   font-size: 2.5rem;
   color: #1b1b1e;
   margin-bottom: 0.5rem;
@@ -37,7 +37,7 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
-  font-family: 'Louisville Script Bold', cursive;
+  font-family: 'Louisville Script W07 Bold It', 'Louisville Script Bold', cursive;
   font-size: 1.1rem;
 }
 
@@ -57,7 +57,7 @@
 }
 
 .create-music-form h3 {
-  font-family: 'Louisville Script Bold', cursive;
+  font-family: 'Louisville Script W07 Bold It', 'Louisville Script Bold', cursive;
   font-size: 1.8rem;
   color: #1b1b1e;
   margin-bottom: 1.5rem;
@@ -83,7 +83,7 @@
   font-weight: 600;
   color: #1b1b1e;
   margin-bottom: 0.5rem;
-  font-family: 'Louisville Script Bold', cursive;
+  font-family: 'Louisville Script W07 Bold It', 'Louisville Script Bold', cursive;
   font-size: 1.2rem;
 }
 
@@ -139,7 +139,7 @@
   cursor: pointer;
   transition: all 0.2s;
   border: 2px solid transparent;
-  font-family: 'Louisville Script Bold', cursive;
+  font-family: 'Louisville Script W07 Bold It', 'Louisville Script Bold', cursive;
   font-size: 1.1rem;
 }
 
@@ -213,7 +213,7 @@
 }
 
 .track-header h3 {
-  font-family: 'Louisville Script Bold', cursive;
+  font-family: 'Louisville Script W07 Bold It', 'Louisville Script Bold', cursive;
   font-size: 1.3rem;
   color: #1b1b1e;
   margin: 0;
