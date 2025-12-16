@@ -10,12 +10,12 @@ const NotFound = () => {
       {/* Background Pattern */}
       <div className="not-found-background">
         <div className="floating-memories">
-          <div className="memory-bubble memory-1">💝</div>
-          <div className="memory-bubble memory-2">📸</div>
-          <div className="memory-bubble memory-3">🎵</div>
-          <div className="memory-bubble memory-4">✨</div>
-          <div className="memory-bubble memory-5">💫</div>
-          <div className="memory-bubble memory-6">🌟</div>
+          <div className="memory-bubble memory-1"></div>
+          <div className="memory-bubble memory-2"></div>
+          <div className="memory-bubble memory-3"></div>
+          <div className="memory-bubble memory-4"></div>
+          <div className="memory-bubble memory-5"></div>
+          <div className="memory-bubble memory-6"></div>
         </div>
       </div>
 
@@ -31,10 +31,10 @@ const NotFound = () => {
 
         <div className="not-found-illustration">
           <div className="broken-heart">
-            <div className="heart-piece heart-left">💔</div>
+            <div className="heart-piece heart-left"></div>
             <div className="heart-piece heart-right"></div>
           </div>
-          <div className="search-glass">🔍</div>
+          <div className="search-glass"></div>
         </div>
 
         <div className="not-found-message">
@@ -84,30 +84,30 @@ const NotFound = () => {
             {isAuthenticated ? (
               <>
                 <Link to="/timeline" className="suggestion-link">
-                  <span className="suggestion-icon">📅</span>
+                  <span className="suggestion-icon"></span>
                   <span>Timeline</span>
                 </Link>
                 <Link to="/thoughts" className="suggestion-link">
-                  <span className="suggestion-icon">💭</span>
+                  <span className="suggestion-icon"></span>
                   <span>Thoughts</span>
                 </Link>
                 <Link to="/trips" className="suggestion-link">
-                  <span className="suggestion-icon">✈️</span>
+                  <span className="suggestion-icon"></span>
                   <span>Trips</span>
                 </Link>
                 <Link to="/music" className="suggestion-link">
-                  <span className="suggestion-icon">🎵</span>
+                  <span className="suggestion-icon"></span>
                   <span>Music</span>
                 </Link>
               </>
             ) : (
               <>
                 <Link to="/register" className="suggestion-link">
-                  <span className="suggestion-icon">✨</span>
+                  <span className="suggestion-icon"></span>
                   <span>Join BONDS</span>
                 </Link>
                 <Link to="/login" className="suggestion-link">
-                  <span className="suggestion-icon">🔑</span>
+                  <span className="suggestion-icon"></span>
                   <span>Sign In</span>
                 </Link>
               </>
