@@ -7,108 +7,86 @@ const Landing = () => {
 
   return (
     <div className="landing-container page-enter">
-      {/* Floating Elements */}
-      <div className="floating-elements">
-        <div className="floating-shape shape-1"></div>
-        <div className="floating-shape shape-2"></div>
-        <div className="floating-shape shape-3"></div>
-        <div className="floating-shape shape-4"></div>
-        <div className="floating-shape shape-5"></div>
-      </div>
-
-      <div className="landing-content">
-        {/* Elegant Header */}
-        <header className="landing-header">
-          <div className="logo-container">
-            <div className="logo">
-              <h1 className="brand-name">Bonds</h1>
-              <div className="brand-ornament"></div>
-              <p className="logo-subtitle">Where friendships live forever</p>
-            </div>
-          </div>
+      {/* Hero Cover Section with Group Photo */}
+      <section className="hero-cover-section">
+        <div className="hero-cover-image">
+          <img 
+            src="/us.jpeg" 
+            alt="Our friendship journey - 12 years of memories" 
+            className="cover-photo"
+            loading="eager"
+          />
+          <div className="hero-overlay"></div>
+        </div>
+        
+        {/* Navigation Header */}
+        <header className="hero-header">
           {isAuthenticated && (
             <div className="auth-nav">
-              <Link to="/dashboard" className="btn btn-secondary btn-small">
+              <Link to="/dashboard" className="btn btn-glass">
                 <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20">
                   <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
                 </svg>
                 <span>Go to Dashboard</span>
-                <div className="btn-shine"></div>
               </Link>
             </div>
           )}
         </header>
 
-        {/* Hero Section */}
-        <main className="landing-main">
-          <div className="hero-section">
-            <div className="hero-content">
-              <div className="hero-badge">
-                <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                </svg>
-                <span>Celebrate Friendship</span>
-              </div>
-              
-              <h2 className="hero-title">
-                <span className="title-line">Treasure every</span>
-                <span className="title-line hero-highlight">beautiful moment</span>
-                <span className="title-line">with your dearest friends</span>
-              </h2>
-              
-              <p className="hero-description">
-                Create an intimate sanctuary for your most precious memories. Share inside jokes, 
-                capture adventures, and weave together the golden threads that make your 
-                friendships extraordinary and timeless.
-              </p>
-
-              <div className="cta-section">
-                <Link to="/signup" className="btn btn-primary btn-elegant">
-                  <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
-                  </svg>
-                  <span>Begin Your Journey</span>
-                  <div className="btn-glow"></div>
-                </Link>
-                <Link to="/login" className="btn btn-secondary btn-elegant">
-                  <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M3 3a1 1 0 00-1 1v12a1 1 0 102 0V4a1 1 0 01-1-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z" clipRule="evenodd" />
-                  </svg>
-                  <span>Welcome Back</span>
-                  <div className="btn-shine"></div>
-                </Link>
-              </div>
-
-              <div className="trust-indicators">
-                <div className="trust-item">
-                  <div className="trust-icon">
-                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 616 0z" clipRule="evenodd" />
-                    </svg>
-                  </div>
-                  <span>Private & Secure</span>
-                </div>
-                <div className="trust-item">
-                  <div className="trust-icon">
-                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20">
-                      <path d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" />
-                    </svg>
-                  </div>
-                  <span>Made with Love</span>
-                </div>
-                <div className="trust-item">
-                  <div className="trust-icon">
-                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20">
-                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                    </svg>
-                  </div>
-                  <span>Forever Free</span>
-                </div>
-              </div>
+        {/* Hero Content */}
+        <div className="hero-content">
+          <div className="hero-text">
+            <div className="hero-badge">
+              <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" />
+              </svg>
+              <span>12 Years of Friendship</span>
             </div>
+            
+            <h1 className="hero-title">
+              <span className="brand-name">BONDS</span>
+            </h1>
+            
+            <p className="hero-tagline">Where friendships live forever</p>
+            
+            <p className="hero-subtitle">
+              12 years of memories, laughter, and togetherness
+            </p>
 
-
+            <div className="cta-section">
+              <Link to="/signup" className="btn btn-primary btn-hero">
+                <span>Explore Our Journey</span>
+                <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" />
+                </svg>
+              </Link>
+              <Link to="/login" className="btn btn-glass btn-hero">
+                <span>Welcome Back</span>
+                <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M3 3a1 1 0 00-1 1v12a1 1 0 102 0V4a1 1 0 01-1-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z" clipRule="evenodd" />
+                </svg>
+              </Link>
+            </div>
           </div>
+        </div>
+
+        {/* Scroll Indicator */}
+        <div className="scroll-indicator" onClick={() => {
+          document.querySelector('.landing-content')?.scrollIntoView({ 
+            behavior: 'smooth' 
+          });
+        }}>
+          <div className="scroll-arrow">
+            <svg width="24" height="24" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+            </svg>
+          </div>
+        </div>
+      </section>
+
+      {/* Content Section */}
+      <div className="landing-content">
+        <main className="landing-main">
 
           {/* Elegant Features */}
           <section className="features-section">
