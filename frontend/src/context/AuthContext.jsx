@@ -30,9 +30,15 @@ const initialState = {
 export const AuthProvider = ({ children }) => {
   const [state, dispatch] = useReducer(authReducer, initialState);
 
-  // Check authentication on app load
+  // Check authentication on app load only if we have a token
   useEffect(() => {
-    checkAuthStatus();
+    const token = localStorage.getItem('authToken');
+    if (token) {
+      checkAuthStatus();
+    } else {
+      // No token, set loading to false immediately
+      dispatch({ type: 'CLEAR_USER' });
+    }
   }, []);
 
   const checkAuthStatus = async () => {

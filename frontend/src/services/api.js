@@ -38,13 +38,8 @@ api.interceptors.response.use(
         case 401:
           // Unauthorized - clear token but don't redirect during auth check
           localStorage.removeItem('authToken');
-          // Only redirect if this is not an auth check request
-          if (!config.url?.includes('/auth/me') && 
-              !window.location.pathname.includes('/login') && 
-              !window.location.pathname.includes('/register') && 
-              window.location.pathname !== '/') {
-            window.location.href = '/login';
-          }
+          // Don't redirect on 401 - let React Router handle it
+          console.log('Authentication failed - token cleared');
           break;
         case 403:
           // Forbidden
