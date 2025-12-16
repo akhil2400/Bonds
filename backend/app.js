@@ -21,6 +21,16 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(cookieParser());
 
+// Root route for Render health check
+app.get('/', (req, res) => {
+  res.json({
+    success: true,
+    message: 'BONDS API Server is running!',
+    timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV || 'development'
+  });
+});
+
 // Health check
 app.get('/health', (req, res) => {
   const mongoose = require('mongoose');

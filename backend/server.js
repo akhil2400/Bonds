@@ -13,6 +13,18 @@ if (!process.env.MONGO_URI) {
   process.exit(1);
 }
 
+if (!process.env.JWT_SECRET) {
+  console.error('❌ JWT_SECRET is not defined in environment variables');
+  console.error('💡 JWT_SECRET is required for authentication');
+  process.exit(1);
+}
+
+if (process.env.JWT_SECRET.length < 32) {
+  console.error('❌ JWT_SECRET is too short (minimum 32 characters required)');
+  console.error('💡 Use a strong, random secret for production');
+  process.exit(1);
+}
+
 const app = require('./app');
 const connectDB = require('./config/db');
 const MailerService = require('./utils/mailer');

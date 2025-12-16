@@ -50,6 +50,7 @@ const corsConfig = cors({
   origin: function (origin, callback) {
     const allowedOrigins = [
       process.env.CLIENT_URL,
+      // Local development
       'http://localhost:3000',
       'http://localhost:3001',
       'http://localhost:5173',
@@ -66,11 +67,19 @@ const corsConfig = cors({
       'http://192.168.56.1:5174',
       'http://192.168.56.1:5175',
       'http://192.168.56.1:5176'
-    ];
+    ].filter(Boolean); // Remove undefined values
     
     // Allow requests with no origin (mobile apps, etc.) in development
     if (!origin && process.env.NODE_ENV === 'development') {
       return callback(null, true);
+    }
+    
+    // In production, also allow Vercel preview URLs
+    if (process.env.NODE_ENV === 'production' && origin) {
+      // Allow Vercel deployment URLs (*.vercel.app)
+      if (origin.endsWith('.vercel.app')) {
+        return callback(null, true);
+      }
     }
     
     if (allowedOrigins.includes(origin)) {
