@@ -20,13 +20,13 @@ const storage = multer.diskStorage({
   }
 });
 
-// File filter for images only
+// File filter for images and videos
 const fileFilter = (req, file, cb) => {
-  // Check if file is an image
-  if (file.mimetype.startsWith('image/')) {
+  // Check if file is an image or video
+  if (file.mimetype.startsWith('image/') || file.mimetype.startsWith('video/')) {
     cb(null, true);
   } else {
-    cb(new Error('Only image files are allowed!'), false);
+    cb(new Error('Only image and video files are allowed!'), false);
   }
 };
 
@@ -35,7 +35,7 @@ const upload = multer({
   storage: storage,
   fileFilter: fileFilter,
   limits: {
-    fileSize: 10 * 1024 * 1024, // 10MB limit
+    fileSize: 100 * 1024 * 1024, // 100MB limit (increased for videos)
     files: 10 // Maximum 10 files
   }
 });
@@ -45,6 +45,9 @@ const uploadSingle = upload.single('image');
 
 // Middleware for multiple image upload
 const uploadMultiple = upload.array('images', 10);
+
+// Middleware for multiple media upload (images and videos)
+const uploadMultipleMedia = upload.array('media', 10);
 
 // Clean up temporary files
 const cleanupFiles = (files) => {
@@ -64,5 +67,6 @@ const cleanupFiles = (files) => {
 module.exports = {
   uploadSingle,
   uploadMultiple,
+  uploadMultipleMedia,
   cleanupFiles
 };

@@ -23,7 +23,13 @@ const memorySchema = new mongoose.Schema({
     width: Number,
     height: Number,
     format: String,
-    bytes: Number
+    bytes: Number,
+    duration: Number, // For videos - duration in seconds
+    resourceType: {
+      type: String,
+      enum: ['image', 'video'],
+      default: 'image'
+    }
   }],
   owner: {
     type: mongoose.Schema.Types.ObjectId,

@@ -1,6 +1,6 @@
 const MemoryRepository = require('../repositories/MemoryRepository');
 const CustomError = require('../errors/CustomError');
-const { deleteMultipleImages } = require('../config/cloudinary');
+const { deleteMultipleImages, deleteMultipleMedia } = require('../config/cloudinary');
 const { isTrustedMember, TRUSTED_MEMBER_EMAILS } = require('../middlewares/authorization');
 
 class MemoryService {
@@ -122,16 +122,14 @@ class MemoryService {
       }
     }
 
-    // Delete images from Cloudinary
+    // Delete media from Cloudinary
     if (memory.media && memory.media.length > 0) {
       try {
-        const publicIds = memory.media.map(img => img.publicId).filter(Boolean);
-        if (publicIds.length > 0) {
-          await deleteMultipleImages(publicIds);
-        }
+        // Use new deleteMultipleMedia function that handles both images and videos
+        await deleteMultipleMedia(memory.media);
       } catch (error) {
-        console.error('Error deleting images from Cloudinary:', error);
-        // Continue with memory deletion even if image deletion fails
+        console.error('Error deleting media from Cloudinary:', error);
+        // Continue with memory deletion even if media deletion fails
       }
     }
 

@@ -47,14 +47,14 @@ const Memories = () => {
       formData.append('description', newMemory.description);
       formData.append('isPrivate', newMemory.isPrivate);
       
-      // Add files to FormData
+      // Add files to FormData (both images and videos)
       if (newMemory.selectedFiles && newMemory.selectedFiles.length > 0) {
         newMemory.selectedFiles.forEach(file => {
-          formData.append('images', file);
+          formData.append('media', file);
         });
       }
       
-      await memoryService.createMemoryWithImages(formData);
+      await memoryService.createMemoryWithMedia(formData);
       setNewMemory({ title: '', description: '', media: [], selectedFiles: [], isPrivate: true });
       setShowCreateForm(false);
       fetchMemories();
@@ -65,14 +65,15 @@ const Memories = () => {
     }
   };
 
-  const handleImageUpload = (e) => {
+  const handleMediaUpload = (e) => {
     const files = Array.from(e.target.files);
     setNewMemory(prev => ({
       ...prev,
       selectedFiles: files,
       media: files.map(file => ({
         url: URL.createObjectURL(file),
-        file: file
+        file: file,
+        type: file.type.startsWith('video/') ? 'video' : 'image'
       }))
     }));
   };
@@ -103,23 +104,42 @@ const Memories = () => {
     );
   };
 
-  const renderMemoryImage = (memory) => {
+  const renderMemoryMedia = (memory) => {
     if (!memory.media || memory.media.length === 0) return null;
     
     const firstMedia = memory.media[0];
     
     // Handle Cloudinary object format
     if (firstMedia && typeof firstMedia === 'object' && firstMedia.url) {
+      const isVideo = firstMedia.resourceType === 'video' || firstMedia.format === 'mp4' || firstMedia.format === 'mov';
+      
       return (
-        <div className="memory-image">
-          <img
-            src={firstMedia.url}
-            alt={memory.title}
-            onError={(e) => {
-              e.target.style.display = 'none';
-            }}
-          />
+        <div className="memory-media">
+          {isVideo ? (
+            <video
+              src={firstMedia.url}
+              alt={memory.title}
+              controls
+              preload="metadata"
+              onError={(e) => {
+                e.target.style.display = 'none';
+              }}
+            />
+          ) : (
+            <img
+              src={firstMedia.url}
+              alt={memory.title}
+              onError={(e) => {
+                e.target.style.display = 'none';
+              }}
+            />
+          )}
           {renderPrivacyBadge(memory)}
+          {memory.media.length > 1 && (
+            <div className="media-count-badge">
+              +{memory.media.length - 1}
+            </div>
+          )}
         </div>
       );
     }
@@ -127,7 +147,7 @@ const Memories = () => {
     // Handle old string format (if any exist)
     if (firstMedia && typeof firstMedia === 'string') {
       return (
-        <div className="memory-image">
+        <div className="memory-media">
           <img
             src={firstMedia}
             alt={memory.title}
@@ -282,22 +302,32 @@ const Memories = () => {
             </div>
             
             <div className="form-group">
-              <label>Photos</label>
+              <label>Photos & Videos</label>
               <input
                 type="file"
                 multiple
-                accept="image/*"
-                onChange={handleImageUpload}
+                accept="image/*,video/*"
+                onChange={handleMediaUpload}
                 className="file-input"
               />
+              <div className="file-help-text">
+                Supported formats: Images (JPG, PNG, GIF) and Videos (MP4, MOV, AVI)
+              </div>
               {newMemory.media.length > 0 && (
-                <div className="image-preview">
+                <div className="media-preview">
                   {newMemory.media.map((item, index) => (
                     <div key={index} className="preview-item">
-                      <img src={item.url} alt={`Preview ${index + 1}`} />
+                      {item.type === 'video' ? (
+                        <video src={item.url} controls preload="metadata" />
+                      ) : (
+                        <img src={item.url} alt={`Preview ${index + 1}`} />
+                      )}
+                      <div className="media-type-badge">
+                        {item.type === 'video' ? '🎥' : '📷'}
+                      </div>
                       <button
                         type="button"
-                        className="remove-image"
+                        className="remove-media"
                         onClick={() => {
                           const newFiles = [...newMemory.selectedFiles];
                           const newMedia = [...newMemory.media];
@@ -361,7 +391,7 @@ const Memories = () => {
             {filteredMemories.map((memory) => (
               <div key={memory._id} className="memory-card">
                 {/* Image */}
-                {renderMemoryImage(memory)}
+                {renderMemoryMedia(memory)}
                 
                 {/* Privacy badge for memories without images */}
                 {(!memory.media || memory.media.length === 0 || !memory.media.some(item => 

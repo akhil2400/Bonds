@@ -1,5 +1,5 @@
 const MemoryService = require('../services/MemoryService');
-const { uploadMultipleImages, deleteMultipleImages } = require('../config/cloudinary');
+const { uploadMultipleImages, uploadMultipleMedia, deleteMultipleImages, deleteMultipleMedia } = require('../config/cloudinary');
 const { cleanupFiles } = require('../middlewares/upload');
 
 class MemoryController {
@@ -14,26 +14,30 @@ class MemoryController {
         memoryData.isPrivate = memoryData.isPrivate === 'true';
       }
 
-      // Upload images to Cloudinary if files are provided
-      let uploadedImages = [];
+      // Upload media (images and videos) to Cloudinary if files are provided
+      let uploadedMedia = [];
       if (files && files.length > 0) {
-        console.log(`📸 Uploading ${files.length} images to Cloudinary...`);
+        const imageFiles = files.filter(file => file.mimetype.startsWith('image/'));
+        const videoFiles = files.filter(file => file.mimetype.startsWith('video/'));
+        
+        console.log(`📸 Uploading ${imageFiles.length} images and ${videoFiles.length} videos to Cloudinary...`);
+        
         try {
-          uploadedImages = await uploadMultipleImages(files, 'bonds/memories');
-          console.log('✅ Images uploaded successfully:', uploadedImages.map(img => img.url));
+          uploadedMedia = await uploadMultipleMedia(files, 'bonds/memories');
+          console.log('✅ Media uploaded successfully:', uploadedMedia.map(media => `${media.resourceType}: ${media.url}`));
           // Clean up temporary files
           cleanupFiles(files);
         } catch (uploadError) {
-          console.error('❌ Image upload failed:', uploadError);
+          console.error('❌ Media upload failed:', uploadError);
           // Clean up temporary files on error
           cleanupFiles(files);
           throw uploadError;
         }
       }
 
-      // Add uploaded images to memory data
-      memoryData.media = uploadedImages;
-      console.log('💾 Creating memory with media:', memoryData.media.length, 'images');
+      // Add uploaded media to memory data
+      memoryData.media = uploadedMedia;
+      console.log('💾 Creating memory with media:', memoryData.media.length, 'files');
 
       const memory = await MemoryService.createMemory(userId, memoryData);
 
@@ -43,10 +47,9 @@ class MemoryController {
         memory
       });
     } catch (error) {
-      // Clean up any uploaded images on error
-      if (req.uploadedImages && req.uploadedImages.length > 0) {
-        const publicIds = req.uploadedImages.map(img => img.publicId);
-        deleteMultipleImages(publicIds).catch(console.error);
+      // Clean up any uploaded media on error
+      if (req.uploadedMedia && req.uploadedMedia.length > 0) {
+        deleteMultipleMedia(req.uploadedMedia).catch(console.error);
       }
       next(error);
     }
@@ -138,7 +141,39 @@ class MemoryController {
     }
   }
 
-  // New endpoint for uploading images
+  // New endpoint for uploading media (images and videos)
+  async uploadMedia(req, res, next) {
+    try {
+      const files = req.files;
+
+      if (!files || files.length === 0) {
+        return res.status(400).json({
+          success: false,
+          error: 'No media files provided'
+        });
+      }
+
+      try {
+        const uploadedMedia = await uploadMultipleMedia(files, 'bonds/memories');
+        // Clean up temporary files
+        cleanupFiles(files);
+
+        res.status(200).json({
+          success: true,
+          message: 'Media uploaded successfully',
+          media: uploadedMedia
+        });
+      } catch (uploadError) {
+        // Clean up temporary files on error
+        cleanupFiles(files);
+        throw uploadError;
+      }
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  // Backward compatibility - keep the old uploadImages method
   async uploadImages(req, res, next) {
     try {
       const files = req.files;
