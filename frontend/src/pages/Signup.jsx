@@ -124,8 +124,10 @@ const Signup = () => {
         otp: otpData.otp
       });
 
-      // Update auth context with new user
-      await register(response.user);
+      console.log('OTP verification successful:', response);
+
+      // Update auth context with new user and token (if available)
+      await register(response.user, response.token);
       
       // Redirect will happen automatically via AuthContext
     } catch (err) {

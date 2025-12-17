@@ -109,7 +109,7 @@ class AuthService {
     const accessToken = jwt.sign(
       { userId },
       process.env.JWT_SECRET,
-      { expiresIn: '15m' }
+      { expiresIn: '7d' } // Match cookie expiry
     );
 
     const refreshToken = jwt.sign(

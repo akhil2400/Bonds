@@ -95,7 +95,9 @@ class AuthController {
       res.status(201).json({
         success: true,
         message: 'Account created successfully! Welcome to Bonds.',
-        user: result.user
+        user: result.user,
+        // Include token for mobile fallback (when cookies don't work)
+        token: result.accessToken
       });
 
     } catch (error) {

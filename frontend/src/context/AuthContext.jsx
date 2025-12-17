@@ -55,9 +55,19 @@ export const AuthProvider = ({ children }) => {
       const response = await authService.checkAuth();
       dispatch({ type: 'SET_USER', payload: response.user });
     } catch (error) {
-      // If auth check fails, clear the invalid token and user
-      localStorage.removeItem('authToken');
-      dispatch({ type: 'CLEAR_USER' });
+      console.log('Auth check failed:', error.message);
+      
+      // Only clear auth if it's a real authentication error (401)
+      // Don't clear on network errors or other issues
+      if (error.status === 401) {
+        console.log('Token expired or invalid, clearing auth');
+        localStorage.removeItem('authToken');
+        dispatch({ type: 'CLEAR_USER' });
+      } else {
+        // For network errors, just stop loading but keep user if we had one
+        console.log('Network or other error, keeping current auth state');
+        dispatch({ type: 'SET_LOADING', payload: false });
+      }
     }
   };
 
@@ -79,9 +89,15 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const register = async (userData) => {
+  const register = async (userData, token = null) => {
     try {
       dispatch({ type: 'SET_LOADING', payload: true });
+      
+      // If we have a token (from OTP verification), store it
+      if (token) {
+        localStorage.setItem('authToken', token);
+      }
+      
       // For the new OTP flow, userData will be the user object from verification
       dispatch({ type: 'SET_USER', payload: userData });
       return { user: userData };
