@@ -1,0 +1,223 @@
+.media-cropper-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+}
+
+.media-cropper-modal {
+  background: white;
+  border-radius: 0.75rem;
+  max-width: 90vw;
+  max-height: 90vh;
+  width: 100%;
+  max-width: 600px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+.cropper-header {
+  padding: 1.5rem;
+  border-bottom: 1px solid #e5e7eb;
+  background: #f9fafb;
+}
+
+.cropper-title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.cropper-header h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #111827;
+  margin: 0;
+}
+
+.crop-progress {
+  background: #e5e7eb;
+  color: #374151;
+  padding: 0.25rem 0.75rem;
+  border-radius: 1rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.cropper-header p {
+  color: #6b7280;
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.4;
+}
+
+.cropper-content {
+  padding: 1.5rem;
+  flex: 1;
+  overflow: auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 200px;
+}
+
+/* React Image Crop Customization */
+.ReactCrop {
+  max-width: 100%;
+  max-height: 400px;
+}
+
+.ReactCrop__crop-selection {
+  border: 2px solid #3b82f6;
+  background: rgba(59, 130, 246, 0.1);
+}
+
+.ReactCrop__drag-handle {
+  background: #3b82f6;
+  border: 2px solid white;
+  width: 12px;
+  height: 12px;
+}
+
+.ReactCrop__drag-handle:after {
+  display: none;
+}
+
+/* Video Preview */
+.video-preview {
+  text-align: center;
+  width: 100%;
+}
+
+.video-preview video {
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.video-info {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: #f3f4f6;
+  border-radius: 0.5rem;
+  text-align: left;
+}
+
+.video-info p {
+  margin: 0.25rem 0;
+  font-size: 0.875rem;
+  color: #374151;
+}
+
+.video-info p:first-child {
+  color: #059669;
+  font-weight: 500;
+}
+
+/* Actions */
+.cropper-actions {
+  padding: 1.5rem;
+  border-top: 1px solid #e5e7eb;
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+  background: #f9fafb;
+}
+
+.cancel-btn {
+  padding: 0.625rem 1.25rem;
+  border: 1px solid #d1d5db;
+  background: white;
+  color: #374151;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.cancel-btn:hover:not(:disabled) {
+  background: #f9fafb;
+  border-color: #9ca3af;
+}
+
+.cancel-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.crop-btn {
+  padding: 0.625rem 1.25rem;
+  border: none;
+  background: #3b82f6;
+  color: white;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.2s;
+  min-width: 120px;
+}
+
+.crop-btn:hover:not(:disabled) {
+  background: #2563eb;
+}
+
+.crop-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.processing {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  justify-content: center;
+}
+
+.spinner-small {
+  width: 16px;
+  height: 16px;
+  border: 2px solid transparent;
+  border-top: 2px solid currentColor;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .media-cropper-modal {
+    margin: 0.5rem;
+    max-height: calc(100vh - 1rem);
+  }
+  
+  .cropper-header,
+  .cropper-content,
+  .cropper-actions {
+    padding: 1rem;
+  }
+  
+  .cropper-actions {
+    flex-direction: column;
+  }
+  
+  .cancel-btn,
+  .crop-btn {
+    width: 100%;
+  }
+}

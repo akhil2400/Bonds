@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { memoryService } from '../services/memoryService';
 import PermissionGate from '../components/common/PermissionGate';
 import ItemActions from '../components/common/ItemActions';
+import MediaCropper from '../components/common/MediaCropper';
 import { usePermissions } from '../context/PermissionContext';
 import './Memories.css';
 
@@ -21,6 +22,9 @@ const Memories = () => {
   const [creating, setCreating] = useState(false);
   const [editingMemory, setEditingMemory] = useState(null);
   const [updating, setUpdating] = useState(false);
+  const [cropperFile, setCropperFile] = useState(null);
+  const [pendingFiles, setPendingFiles] = useState([]);
+  const [currentCropIndex, setCurrentCropIndex] = useState(0);
   const { canCreate, isTrustedMember } = usePermissions();
 
   useEffect(() => {
@@ -101,15 +105,86 @@ const Memories = () => {
 
   const handleMediaUpload = (e) => {
     const files = Array.from(e.target.files);
+    
+    if (files.length === 0) return;
+    
+    // Start cropping process for images, or add videos directly
+    const imageFiles = files.filter(file => file.type.startsWith('image/'));
+    const videoFiles = files.filter(file => file.type.startsWith('video/'));
+    
+    // Add videos directly (no cropping needed)
+    const videoMedia = videoFiles.map(file => ({
+      url: URL.createObjectURL(file),
+      file: file,
+      type: 'video'
+    }));
+    
+    if (imageFiles.length > 0) {
+      // Start cropping process for images
+      setPendingFiles(imageFiles);
+      setCurrentCropIndex(0);
+      setCropperFile(imageFiles[0]);
+      
+      // Add videos to current media
+      if (videoFiles.length > 0) {
+        setNewMemory(prev => ({
+          ...prev,
+          selectedFiles: [...prev.selectedFiles, ...videoFiles],
+          media: [...prev.media, ...videoMedia]
+        }));
+      }
+    } else {
+      // Only videos, add them directly
+      setNewMemory(prev => ({
+        ...prev,
+        selectedFiles: [...prev.selectedFiles, ...videoFiles],
+        media: [...prev.media, ...videoMedia]
+      }));
+    }
+    
+    // Clear the input
+    e.target.value = '';
+  };
+
+  const handleCropComplete = (croppedFile) => {
+    // Add the cropped file to the memory
+    const newMedia = {
+      url: URL.createObjectURL(croppedFile),
+      file: croppedFile,
+      type: 'image'
+    };
+    
     setNewMemory(prev => ({
       ...prev,
-      selectedFiles: files,
-      media: files.map(file => ({
-        url: URL.createObjectURL(file),
-        file: file,
-        type: file.type.startsWith('video/') ? 'video' : 'image'
-      }))
+      selectedFiles: [...prev.selectedFiles, croppedFile],
+      media: [...prev.media, newMedia]
     }));
+    
+    // Move to next file or close cropper
+    const nextIndex = currentCropIndex + 1;
+    if (nextIndex < pendingFiles.length) {
+      setCurrentCropIndex(nextIndex);
+      setCropperFile(pendingFiles[nextIndex]);
+    } else {
+      // Done with all files
+      setCropperFile(null);
+      setPendingFiles([]);
+      setCurrentCropIndex(0);
+    }
+  };
+
+  const handleCropCancel = () => {
+    // Skip current file and move to next, or close cropper
+    const nextIndex = currentCropIndex + 1;
+    if (nextIndex < pendingFiles.length) {
+      setCurrentCropIndex(nextIndex);
+      setCropperFile(pendingFiles[nextIndex]);
+    } else {
+      // Done with all files
+      setCropperFile(null);
+      setPendingFiles([]);
+      setCurrentCropIndex(0);
+    }
   };
 
   const renderPrivacyBadge = (memory) => {
@@ -345,7 +420,9 @@ const Memories = () => {
                 className="file-input"
               />
               <div className="file-help-text">
-                Supported formats: Images (JPG, PNG, GIF) and Videos (MP4, MOV, AVI)
+                📸 Images will open a crop editor for perfect framing<br/>
+                🎥 Videos will be uploaded as-is (cropping not available)<br/>
+                Supported: JPG, PNG, GIF, MP4, MOV, AVI
               </div>
               {newMemory.media.length > 0 && (
                 <div className="media-preview">
@@ -551,6 +628,20 @@ const Memories = () => {
           </div>
         );
       })()}
+
+      {/* Media Cropper Modal */}
+      {cropperFile && (
+        <MediaCropper
+          file={cropperFile}
+          onCropComplete={handleCropComplete}
+          onCancel={handleCropCancel}
+          aspectRatio={null} // Free crop, or set to 1 for square, 16/9 for widescreen, etc.
+          progress={pendingFiles.length > 1 ? {
+            current: currentCropIndex + 1,
+            total: pendingFiles.length
+          } : null}
+        />
+      )}
     </div>
   );
 };
