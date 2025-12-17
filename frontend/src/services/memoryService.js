@@ -78,5 +78,23 @@ export const memoryService = {
     } catch (error) {
       throw error;
     }
+  },
+
+  async updateMemory(id, memoryData) {
+    try {
+      const response = await api.put(`/memory/${id}`, memoryData);
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  async deleteMemory(id) {
+    try {
+      const response = await api.delete(`/memory/${id}`);
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
   }
 };

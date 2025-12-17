@@ -26,5 +26,23 @@ export const thoughtService = {
     } catch (error) {
       throw error;
     }
+  },
+
+  async updateThought(id, thoughtData) {
+    try {
+      const response = await api.put(`/thought/${id}`, thoughtData);
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  async deleteThought(id) {
+    try {
+      const response = await api.delete(`/thought/${id}`);
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
   }
 };

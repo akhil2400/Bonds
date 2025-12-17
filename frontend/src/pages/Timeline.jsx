@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { timelineService } from '../services/timelineService';
 import PermissionGate from '../components/common/PermissionGate';
+import ItemActions from '../components/common/ItemActions';
 import { usePermissions } from '../context/PermissionContext';
 import './Timeline.css';
 
@@ -16,6 +17,8 @@ const Timeline = () => {
     media: []
   });
   const [creating, setCreating] = useState(false);
+  const [editingTimeline, setEditingTimeline] = useState(null);
+  const [updating, setUpdating] = useState(false);
   const { canCreate, isTrustedMember } = usePermissions();
 
   useEffect(() => {
@@ -51,6 +54,40 @@ const Timeline = () => {
       setError(err.message);
     } finally {
       setCreating(false);
+    }
+  };
+
+  const handleEditTimeline = (timeline) => {
+    setEditingTimeline({
+      ...timeline,
+      year: timeline.year || new Date().getFullYear()
+    });
+  };
+
+  const handleUpdateTimeline = async (e) => {
+    e.preventDefault();
+    try {
+      setUpdating(true);
+      await timelineService.updateTimeline(editingTimeline._id, {
+        title: editingTimeline.title,
+        description: editingTimeline.description,
+        year: editingTimeline.year
+      });
+      setEditingTimeline(null);
+      fetchTimelines();
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setUpdating(false);
+    }
+  };
+
+  const handleDeleteTimeline = async (timelineId) => {
+    try {
+      await timelineService.deleteTimeline(timelineId);
+      fetchTimelines();
+    } catch (err) {
+      setError(err.message);
     }
   };
 
@@ -153,6 +190,58 @@ const Timeline = () => {
         </div>
       )}
 
+      {/* Edit Timeline Form */}
+      {editingTimeline && (
+        <div className="edit-timeline-form">
+          <h3>Edit Timeline Entry</h3>
+          <form onSubmit={handleUpdateTimeline}>
+            <div className="form-row">
+              <div className="form-group">
+                <label>Year</label>
+                <input
+                  type="number"
+                  required
+                  min="1900"
+                  max="2100"
+                  value={editingTimeline.year}
+                  onChange={(e) => setEditingTimeline({ ...editingTimeline, year: parseInt(e.target.value) })}
+                />
+              </div>
+              <div className="form-group flex-1">
+                <label>Title</label>
+                <input
+                  type="text"
+                  required
+                  value={editingTimeline.title}
+                  onChange={(e) => setEditingTimeline({ ...editingTimeline, title: e.target.value })}
+                  placeholder="What happened this year?"
+                />
+              </div>
+            </div>
+            
+            <div className="form-group">
+              <label>Description</label>
+              <textarea
+                required
+                rows={3}
+                value={editingTimeline.description}
+                onChange={(e) => setEditingTimeline({ ...editingTimeline, description: e.target.value })}
+                placeholder="Tell the story of this moment in time..."
+              />
+            </div>
+            
+            <div className="form-actions">
+              <button type="button" onClick={() => setEditingTimeline(null)}>
+                Cancel
+              </button>
+              <button type="submit" disabled={updating} className="primary">
+                {updating ? 'Updating...' : 'Update Timeline'}
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
+
       {timelines.length === 0 ? (
         <div className="empty-state">
           <p>
@@ -178,7 +267,14 @@ const Timeline = () => {
                 
                 {/* Content card */}
                 <div className="timeline-card">
-                  <h3>{timeline.title}</h3>
+                  <div className="timeline-card-header">
+                    <h3>{timeline.title}</h3>
+                    <ItemActions
+                      item={timeline}
+                      onEdit={handleEditTimeline}
+                      onDelete={handleDeleteTimeline}
+                    />
+                  </div>
                   <p>{timeline.description}</p>
                   
                   {timeline.media && timeline.media.length > 0 && (

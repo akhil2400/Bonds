@@ -26,5 +26,23 @@ export const musicService = {
     } catch (error) {
       throw error;
     }
+  },
+
+  async updateMusic(id, musicData) {
+    try {
+      const response = await api.put(`/music/${id}`, musicData);
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  async deleteMusic(id) {
+    try {
+      const response = await api.delete(`/music/${id}`);
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
   }
 };

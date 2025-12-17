@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { tripService } from '../services/tripService';
 import PermissionGate from '../components/common/PermissionGate';
+import ItemActions from '../components/common/ItemActions';
 import { usePermissions } from '../context/PermissionContext';
 import './Trips.css';
 
@@ -19,6 +20,8 @@ const Trips = () => {
     isPublic: true
   });
   const [creating, setCreating] = useState(false);
+  const [editingTrip, setEditingTrip] = useState(null);
+  const [updating, setUpdating] = useState(false);
   const { canCreate, isTrustedMember } = usePermissions();
 
   useEffect(() => {
@@ -71,6 +74,45 @@ const Trips = () => {
       setError(err.message);
     } finally {
       setCreating(false);
+    }
+  };
+
+  const handleEditTrip = (trip) => {
+    setEditingTrip({
+      ...trip,
+      startDate: trip.startDate ? trip.startDate.split('T')[0] : '',
+      endDate: trip.endDate ? trip.endDate.split('T')[0] : '',
+      budget: trip.budget?.toString() || ''
+    });
+  };
+
+  const handleUpdateTrip = async (e) => {
+    e.preventDefault();
+    try {
+      setUpdating(true);
+      await tripService.updateTrip(editingTrip._id, {
+        destination: editingTrip.destination,
+        description: editingTrip.description,
+        startDate: editingTrip.startDate,
+        endDate: editingTrip.endDate,
+        budget: parseFloat(editingTrip.budget),
+        isPublic: editingTrip.isPublic
+      });
+      setEditingTrip(null);
+      fetchTrips();
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setUpdating(false);
+    }
+  };
+
+  const handleDeleteTrip = async (tripId) => {
+    try {
+      await tripService.deleteTrip(tripId);
+      fetchTrips();
+    } catch (err) {
+      setError(err.message);
     }
   };
 
@@ -222,6 +264,90 @@ const Trips = () => {
         </div>
       )}
 
+      {/* Edit Trip Form */}
+      {editingTrip && (
+        <div className="edit-trip-form">
+          <h3>Edit Trip</h3>
+          <form onSubmit={handleUpdateTrip}>
+            <div className="form-row">
+              <div className="form-group flex-1">
+                <label>Destination</label>
+                <input
+                  type="text"
+                  required
+                  value={editingTrip.destination}
+                  onChange={(e) => setEditingTrip({ ...editingTrip, destination: e.target.value })}
+                  placeholder="Where are you going?"
+                />
+              </div>
+              <div className="form-group">
+                <label>Budget ($)</label>
+                <input
+                  type="number"
+                  required
+                  min="0"
+                  step="0.01"
+                  value={editingTrip.budget}
+                  onChange={(e) => setEditingTrip({ ...editingTrip, budget: e.target.value })}
+                  placeholder="0.00"
+                />
+              </div>
+            </div>
+            
+            <div className="form-group">
+              <label>Description</label>
+              <textarea
+                required
+                rows={3}
+                value={editingTrip.description}
+                onChange={(e) => setEditingTrip({ ...editingTrip, description: e.target.value })}
+                placeholder="Describe your trip plans..."
+              />
+            </div>
+            
+            <div className="form-row">
+              <div className="form-group flex-1">
+                <label>Start Date</label>
+                <input
+                  type="date"
+                  required
+                  value={editingTrip.startDate}
+                  onChange={(e) => setEditingTrip({ ...editingTrip, startDate: e.target.value })}
+                />
+              </div>
+              <div className="form-group flex-1">
+                <label>End Date</label>
+                <input
+                  type="date"
+                  required
+                  value={editingTrip.endDate}
+                  onChange={(e) => setEditingTrip({ ...editingTrip, endDate: e.target.value })}
+                />
+              </div>
+            </div>
+            
+            <div className="form-footer">
+              <label className="privacy-toggle">
+                <input
+                  type="checkbox"
+                  checked={editingTrip.isPublic}
+                  onChange={(e) => setEditingTrip({ ...editingTrip, isPublic: e.target.checked })}
+                />
+                <span>Make public</span>
+              </label>
+              <div className="form-actions">
+                <button type="button" onClick={() => setEditingTrip(null)}>
+                  Cancel
+                </button>
+                <button type="submit" disabled={updating} className="primary">
+                  {updating ? 'Updating...' : 'Update Trip'}
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+      )}
+
       {trips.length === 0 ? (
         <div className="empty-state">
           <p>
@@ -240,7 +366,14 @@ const Trips = () => {
               {/* Header */}
               <div className="trip-header">
                 <div className="trip-title-section">
-                  <h3>{trip.destination}</h3>
+                  <div className="trip-title-row">
+                    <h3>{trip.destination}</h3>
+                    <ItemActions
+                      item={trip}
+                      onEdit={handleEditTrip}
+                      onDelete={handleDeleteTrip}
+                    />
+                  </div>
                   <span className={`privacy-badge ${trip.isPublic ? 'public' : 'private'}`}>
                     {trip.isPublic ? 'Public' : 'Private'}
                   </span>

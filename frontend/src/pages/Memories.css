@@ -724,3 +724,31 @@
 .remove-image:hover {
   background: rgba(239, 68, 68, 1);
 }
+/* Memory Header with Actions */
+.memory-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0.5rem;
+}
+
+.memory-header h3 {
+  margin: 0;
+  flex: 1;
+}
+
+/* Edit Memory Form */
+.edit-memory-form {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.edit-memory-form h3 {
+  color: #1e293b;
+  margin-bottom: 1rem;
+  font-size: 1.125rem;
+  font-weight: 600;
+}

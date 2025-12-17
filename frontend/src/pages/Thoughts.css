@@ -306,3 +306,31 @@
     gap: 0.25rem;
   }
 }
+/* Thought Actions */
+.thought-title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  width: 100%;
+}
+
+.thought-title-row h3 {
+  margin: 0;
+  flex: 1;
+}
+
+/* Edit Thought Form */
+.edit-thought-form {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.edit-thought-form h3 {
+  color: #1e293b;
+  margin-bottom: 1rem;
+  font-size: 1.125rem;
+  font-weight: 600;
+}

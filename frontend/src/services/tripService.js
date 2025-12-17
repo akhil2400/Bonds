@@ -35,5 +35,23 @@ export const tripService = {
     } catch (error) {
       throw error;
     }
+  },
+
+  async updateTrip(id, tripData) {
+    try {
+      const response = await api.put(`/trip/${id}`, tripData);
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  async deleteTrip(id) {
+    try {
+      const response = await api.delete(`/trip/${id}`);
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
   }
 };

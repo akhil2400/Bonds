@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { thoughtService } from '../services/thoughtService';
 import PermissionGate from '../components/common/PermissionGate';
+import ItemActions from '../components/common/ItemActions';
 import { usePermissions } from '../context/PermissionContext';
 import './Thoughts.css';
 
@@ -11,6 +12,8 @@ const Thoughts = () => {
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [newThought, setNewThought] = useState({ title: '', content: '', isPrivate: true });
   const [creating, setCreating] = useState(false);
+  const [editingThought, setEditingThought] = useState(null);
+  const [updating, setUpdating] = useState(false);
   const { canCreate, isTrustedMember } = usePermissions();
 
   useEffect(() => {
@@ -41,6 +44,37 @@ const Thoughts = () => {
       setError(err.message);
     } finally {
       setCreating(false);
+    }
+  };
+
+  const handleEditThought = (thought) => {
+    setEditingThought({ ...thought });
+  };
+
+  const handleUpdateThought = async (e) => {
+    e.preventDefault();
+    try {
+      setUpdating(true);
+      await thoughtService.updateThought(editingThought._id, {
+        title: editingThought.title,
+        content: editingThought.content,
+        isPrivate: editingThought.isPrivate
+      });
+      setEditingThought(null);
+      fetchThoughts();
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setUpdating(false);
+    }
+  };
+
+  const handleDeleteThought = async (thoughtId) => {
+    try {
+      await thoughtService.deleteThought(thoughtId);
+      fetchThoughts();
+    } catch (err) {
+      setError(err.message);
     }
   };
 
@@ -130,6 +164,53 @@ const Thoughts = () => {
         </div>
       )}
 
+      {/* Edit Thought Form */}
+      {editingThought && (
+        <div className="edit-thought-form">
+          <h3>Edit Thought</h3>
+          <form onSubmit={handleUpdateThought}>
+            <div className="form-group">
+              <label>Title</label>
+              <input
+                type="text"
+                required
+                value={editingThought.title}
+                onChange={(e) => setEditingThought({ ...editingThought, title: e.target.value })}
+                placeholder="What's on your mind?"
+              />
+            </div>
+            <div className="form-group">
+              <label>Content</label>
+              <textarea
+                required
+                rows={4}
+                value={editingThought.content}
+                onChange={(e) => setEditingThought({ ...editingThought, content: e.target.value })}
+                placeholder="Share your thoughts..."
+              />
+            </div>
+            <div className="form-footer">
+              <label className="privacy-toggle">
+                <input
+                  type="checkbox"
+                  checked={editingThought.isPrivate}
+                  onChange={(e) => setEditingThought({ ...editingThought, isPrivate: e.target.checked })}
+                />
+                <span>Keep private</span>
+              </label>
+              <div className="form-actions">
+                <button type="button" onClick={() => setEditingThought(null)}>
+                  Cancel
+                </button>
+                <button type="submit" disabled={updating} className="primary">
+                  {updating ? 'Updating...' : 'Update Thought'}
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+      )}
+
       {/* Thoughts List */}
       {thoughts.length === 0 ? (
         <div className="empty-state">
@@ -145,7 +226,14 @@ const Thoughts = () => {
           {thoughts.map((thought) => (
             <div key={thought._id} className="thought-card">
               <div className="thought-header">
-                <h3>{thought.title}</h3>
+                <div className="thought-title-row">
+                  <h3>{thought.title}</h3>
+                  <ItemActions
+                    item={thought}
+                    onEdit={handleEditThought}
+                    onDelete={handleDeleteThought}
+                  />
+                </div>
                 {thought.isPrivate && (
                   <span className="private-badge">
                     Private

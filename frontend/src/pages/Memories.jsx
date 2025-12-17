@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { memoryService } from '../services/memoryService';
 import PermissionGate from '../components/common/PermissionGate';
+import ItemActions from '../components/common/ItemActions';
 import { usePermissions } from '../context/PermissionContext';
 import './Memories.css';
 
@@ -18,6 +19,8 @@ const Memories = () => {
     isPrivate: true
   });
   const [creating, setCreating] = useState(false);
+  const [editingMemory, setEditingMemory] = useState(null);
+  const [updating, setUpdating] = useState(false);
   const { canCreate, isTrustedMember } = usePermissions();
 
   useEffect(() => {
@@ -62,6 +65,37 @@ const Memories = () => {
       setError(err.message);
     } finally {
       setCreating(false);
+    }
+  };
+
+  const handleEditMemory = (memory) => {
+    setEditingMemory({ ...memory });
+  };
+
+  const handleUpdateMemory = async (e) => {
+    e.preventDefault();
+    try {
+      setUpdating(true);
+      await memoryService.updateMemory(editingMemory._id, {
+        title: editingMemory.title,
+        description: editingMemory.description,
+        isPrivate: editingMemory.isPrivate
+      });
+      setEditingMemory(null);
+      fetchMemories();
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setUpdating(false);
+    }
+  };
+
+  const handleDeleteMemory = async (memoryId) => {
+    try {
+      await memoryService.deleteMemory(memoryId);
+      fetchMemories();
+    } catch (err) {
+      setError(err.message);
     }
   };
 
@@ -360,6 +394,82 @@ const Memories = () => {
         </div>
       )}
 
+      {/* Edit Memory Form */}
+      {editingMemory && (
+        <div className="edit-memory-form">
+          <h3>Edit Memory</h3>
+          <form onSubmit={handleUpdateMemory}>
+            <div className="form-group">
+              <label>Title</label>
+              <input
+                type="text"
+                required
+                value={editingMemory.title}
+                onChange={(e) => setEditingMemory({ ...editingMemory, title: e.target.value })}
+                placeholder="Give your memory a title..."
+              />
+            </div>
+            
+            <div className="form-group">
+              <label>Description</label>
+              <textarea
+                required
+                rows={3}
+                value={editingMemory.description}
+                onChange={(e) => setEditingMemory({ ...editingMemory, description: e.target.value })}
+                placeholder="Describe this precious moment..."
+              />
+            </div>
+            
+            <div className="form-group">
+              <label>Privacy Setting</label>
+              <div className="privacy-options">
+                <label className="privacy-option">
+                  <input
+                    type="radio"
+                    name="editPrivacy"
+                    value="true"
+                    checked={editingMemory.isPrivate === true}
+                    onChange={(e) => setEditingMemory({ ...editingMemory, isPrivate: true })}
+                  />
+                  <span className="privacy-label">
+                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 616 0z" clipRule="evenodd" />
+                    </svg>
+                    Private (Only trusted members can see)
+                  </span>
+                </label>
+                <label className="privacy-option">
+                  <input
+                    type="radio"
+                    name="editPrivacy"
+                    value="false"
+                    checked={editingMemory.isPrivate === false}
+                    onChange={(e) => setEditingMemory({ ...editingMemory, isPrivate: false })}
+                  />
+                  <span className="privacy-label">
+                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
+                      <path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd" />
+                    </svg>
+                    Public (All members can see)
+                  </span>
+                </label>
+              </div>
+            </div>
+            
+            <div className="form-actions">
+              <button type="button" onClick={() => setEditingMemory(null)}>
+                Cancel
+              </button>
+              <button type="submit" disabled={updating} className="primary">
+                {updating ? 'Updating...' : 'Update Memory'}
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
+
       {(() => {
         // Filter memories based on user role and privacy filter
         const filteredMemories = memories.filter(memory => {
@@ -404,7 +514,14 @@ const Memories = () => {
                 
                 {/* Content */}
                 <div className="memory-content">
-                  <h3>{memory.title}</h3>
+                  <div className="memory-header">
+                    <h3>{memory.title}</h3>
+                    <ItemActions
+                      item={memory}
+                      onEdit={handleEditMemory}
+                      onDelete={handleDeleteMemory}
+                    />
+                  </div>
                   <p className="memory-description">{memory.description}</p>
                   
                   {/* Media count */}

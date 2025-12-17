@@ -26,5 +26,23 @@ export const timelineService = {
     } catch (error) {
       throw error;
     }
+  },
+
+  async updateTimeline(id, timelineData) {
+    try {
+      const response = await api.put(`/timeline/${id}`, timelineData);
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  async deleteTimeline(id) {
+    try {
+      const response = await api.delete(`/timeline/${id}`);
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
   }
 };

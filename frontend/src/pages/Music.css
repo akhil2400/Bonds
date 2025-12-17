@@ -417,3 +417,31 @@
     text-align: center;
   }
 }
+/* Music Track Actions */
+.track-title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  width: 100%;
+}
+
+.track-title-row h3 {
+  margin: 0;
+  flex: 1;
+}
+
+/* Edit Music Form */
+.edit-music-form {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.edit-music-form h3 {
+  color: #1e293b;
+  margin-bottom: 1rem;
+  font-size: 1.125rem;
+  font-weight: 600;
+}

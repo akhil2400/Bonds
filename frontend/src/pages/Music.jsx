@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { musicService } from '../services/musicService';
 import PermissionGate from '../components/common/PermissionGate';
+import ItemActions from '../components/common/ItemActions';
 import { usePermissions } from '../context/PermissionContext';
 import './Music.css';
 
@@ -18,6 +19,8 @@ const Music = () => {
     isPrivate: false
   });
   const [creating, setCreating] = useState(false);
+  const [editingMusic, setEditingMusic] = useState(null);
+  const [updating, setUpdating] = useState(false);
   const { canCreate, isTrustedMember } = usePermissions();
 
   useEffect(() => {
@@ -55,6 +58,40 @@ const Music = () => {
       setError(err.message);
     } finally {
       setCreating(false);
+    }
+  };
+
+  const handleEditMusic = (track) => {
+    setEditingMusic({ ...track });
+  };
+
+  const handleUpdateMusic = async (e) => {
+    e.preventDefault();
+    try {
+      setUpdating(true);
+      await musicService.updateMusic(editingMusic._id, {
+        title: editingMusic.title,
+        artist: editingMusic.artist,
+        platform: editingMusic.platform,
+        link: editingMusic.link,
+        description: editingMusic.description,
+        isPrivate: editingMusic.isPrivate
+      });
+      setEditingMusic(null);
+      fetchMusic();
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setUpdating(false);
+    }
+  };
+
+  const handleDeleteMusic = async (musicId) => {
+    try {
+      await musicService.deleteMusic(musicId);
+      fetchMusic();
+    } catch (err) {
+      setError(err.message);
     }
   };
 
@@ -214,6 +251,92 @@ const Music = () => {
         </div>
       )}
 
+      {/* Edit Music Form */}
+      {editingMusic && (
+        <div className="edit-music-form">
+          <h3>Edit Music Track</h3>
+          <form onSubmit={handleUpdateMusic}>
+            <div className="form-row">
+              <div className="form-group flex-1">
+                <label>Song Title</label>
+                <input
+                  type="text"
+                  required
+                  value={editingMusic.title}
+                  onChange={(e) => setEditingMusic({ ...editingMusic, title: e.target.value })}
+                  placeholder="Song title..."
+                />
+              </div>
+              <div className="form-group flex-1">
+                <label>Artist</label>
+                <input
+                  type="text"
+                  required
+                  value={editingMusic.artist}
+                  onChange={(e) => setEditingMusic({ ...editingMusic, artist: e.target.value })}
+                  placeholder="Artist name..."
+                />
+              </div>
+            </div>
+            
+            <div className="form-row">
+              <div className="form-group">
+                <label>Platform</label>
+                <select
+                  value={editingMusic.platform}
+                  onChange={(e) => setEditingMusic({ ...editingMusic, platform: e.target.value })}
+                >
+                  <option value="Spotify">Spotify</option>
+                  <option value="YouTube">YouTube</option>
+                  <option value="Apple Music">Apple Music</option>
+                  <option value="SoundCloud">SoundCloud</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+              <div className="form-group flex-1">
+                <label>Link</label>
+                <input
+                  type="url"
+                  required
+                  value={editingMusic.link}
+                  onChange={(e) => setEditingMusic({ ...editingMusic, link: e.target.value })}
+                  placeholder="https://..."
+                />
+              </div>
+            </div>
+            
+            <div className="form-group">
+              <label>Description (Optional)</label>
+              <textarea
+                rows={2}
+                value={editingMusic.description}
+                onChange={(e) => setEditingMusic({ ...editingMusic, description: e.target.value })}
+                placeholder="Why this song is special..."
+              />
+            </div>
+            
+            <div className="form-footer">
+              <label className="privacy-toggle">
+                <input
+                  type="checkbox"
+                  checked={editingMusic.isPrivate}
+                  onChange={(e) => setEditingMusic({ ...editingMusic, isPrivate: e.target.checked })}
+                />
+                <span>Keep private</span>
+              </label>
+              <div className="form-actions">
+                <button type="button" onClick={() => setEditingMusic(null)}>
+                  Cancel
+                </button>
+                <button type="submit" disabled={updating} className="primary">
+                  {updating ? 'Updating...' : 'Update Track'}
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+      )}
+
       {music.length === 0 ? (
         <div className="empty-state">
           <p>
@@ -236,7 +359,14 @@ const Music = () => {
                 {/* Track Info */}
                 <div className="track-info">
                   <div className="track-header">
-                    <h3>{track.title}</h3>
+                    <div className="track-title-row">
+                      <h3>{track.title}</h3>
+                      <ItemActions
+                        item={track}
+                        onEdit={handleEditMusic}
+                        onDelete={handleDeleteMusic}
+                      />
+                    </div>
                     {track.isPrivate && (
                       <span className="private-badge">
                         Private
