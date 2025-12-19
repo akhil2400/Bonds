@@ -45,7 +45,7 @@ export const PermissionProvider = ({ children }) => {
   const canEdit = () => permissions?.canEdit || false;
   const canDelete = () => permissions?.canDelete || false;
   const isAdmin = () => permissions?.isAdmin || false;
-  const isTrustedMember = () => permissions?.canCreate || false; // Trusted members can create
+  const isTrustedMember = () => permissions?.isTrustedMember || false; // Use actual trusted member status
 
   // Role information
   const getUserRole = () => permissions?.role || 'viewer';

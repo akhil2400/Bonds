@@ -117,7 +117,9 @@ const getUserPermissions = (user) => {
       canCreate: false,
       canEdit: false,
       canDelete: false,
-      isAdmin: false
+      isAdmin: false,
+      isTrustedMember: false,
+      role: 'viewer'
     };
   }
 
@@ -130,6 +132,7 @@ const getUserPermissions = (user) => {
     canEdit: trusted,
     canDelete: trusted || isAdmin, // Admins can delete anything
     isAdmin: isAdmin,
+    isTrustedMember: trusted, // Include trusted member status
     role: user.role
   };
 };
