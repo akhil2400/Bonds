@@ -1,15 +1,30 @@
-import { useState } from 'react';
-import { Link, Navigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Link, Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import './Login.css';
 
 const Login = () => {
+  const location = useLocation();
   const { login, isAuthenticated, loading, error, clearError } = useAuth();
   const [formData, setFormData] = useState({
     email: '',
     password: ''
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
+
+  // Handle success message from signup redirect
+  useEffect(() => {
+    if (location.state?.message) {
+      setSuccessMessage(location.state.message);
+      // Pre-fill email if provided
+      if (location.state.email) {
+        setFormData(prev => ({ ...prev, email: location.state.email }));
+      }
+      // Clear the message after 5 seconds
+      setTimeout(() => setSuccessMessage(''), 5000);
+    }
+  }, [location.state]);
 
   // Redirect if already authenticated
   if (isAuthenticated) {
@@ -49,6 +64,12 @@ const Login = () => {
         </div>
 
         <form className="login-form" onSubmit={handleSubmit}>
+          {successMessage && (
+            <div className="alert alert-success">
+              {successMessage}
+            </div>
+          )}
+          
           {error && (
             <div className="alert alert-error">
               {error}

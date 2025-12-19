@@ -1,3 +1,5 @@
+// COMMENTED OUT: Email verification system disabled
+// Using direct signup without email verification
 const { Resend } = require('resend');
 const CustomError = require('../errors/CustomError');
 

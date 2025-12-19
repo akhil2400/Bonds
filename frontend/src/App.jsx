@@ -31,9 +31,10 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Signup />} />
           <Route path="/signup" element={<Navigate to="/register" replace />} />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/verify" element={<VerifyMagicLink />} />
-          <Route path="/reset-password" element={<ResetPassword />} />
+          {/* COMMENTED OUT: Magic Link routes (not needed for direct signup) */}
+          {/* <Route path="/forgot-password" element={<ForgotPassword />} /> */}
+          {/* <Route path="/verify" element={<VerifyMagicLink />} /> */}
+          {/* <Route path="/reset-password" element={<ResetPassword />} /> */}
           <Route path="/dashboard" element={
             <ProtectedRoute>
               <Layout>
