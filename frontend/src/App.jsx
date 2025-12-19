@@ -10,6 +10,8 @@ import Landing from './pages/Landing';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import ForgotPassword from './pages/ForgotPassword';
+import VerifyMagicLink from './pages/VerifyMagicLink';
+import ResetPassword from './pages/ResetPassword';
 import Home from './pages/Home';
 import Timeline from './pages/Timeline';
 import Memories from './pages/Memories';
@@ -30,6 +32,8 @@ function App() {
           <Route path="/register" element={<Signup />} />
           <Route path="/signup" element={<Navigate to="/register" replace />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/verify" element={<VerifyMagicLink />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/dashboard" element={
             <ProtectedRoute>
               <Layout>

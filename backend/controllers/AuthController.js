@@ -1,9 +1,9 @@
 const AuthService = require('../services/AuthService');
-const OTPService = require('../services/OTPService');
+const MagicLinkService = require('../services/MagicLinkService');
 const { getAccessTokenOptions, getRefreshTokenOptions, getClearCookieOptions } = require('../utils/cookieConfig');
 
 class AuthController {
-  // Step 1: Initial signup - sends OTP, does NOT create user
+  // Step 1: Initial signup - sends Magic Link, does NOT create user
   async signup(req, res, next) {
     try {
       const { name, email, password } = req.body;
@@ -42,14 +42,24 @@ class AuthController {
         });
       }
 
-      // Generate and send OTP
-      const result = await OTPService.generateAndSendOTP(email, name);
+      // Get client info for security
+      const ipAddress = req.ip || req.connection.remoteAddress;
+      const userAgent = req.get('User-Agent');
+
+      // Generate and send Magic Link
+      const result = await MagicLinkService.generateAndSendSignupLink(
+        email, 
+        { name, password }, 
+        ipAddress, 
+        userAgent
+      );
 
       res.status(200).json({
         success: true,
         message: result.message,
         email: email.replace(/(.{2}).*(@.*)/, '$1***$2'), // Mask email for security
-        expiresAt: result.expiresAt
+        expiresAt: result.expiresAt,
+        note: result.note
       });
 
     } catch (error) {
@@ -57,58 +67,82 @@ class AuthController {
     }
   }
 
-  // Step 2: Verify OTP and create user account
-  async verifyOTP(req, res, next) {
+  // Step 2: Verify Magic Link and create user account
+  async verifyMagicLink(req, res, next) {
     try {
-      const { name, email, password, otp } = req.body;
+      const { token } = req.body;
 
       // Validate required fields
-      if (!name || !email || !password || !otp) {
+      if (!token) {
         return res.status(400).json({
           success: false,
-          error: 'Name, email, password, and OTP are required'
+          error: 'Verification token is required'
         });
       }
 
-      // Verify OTP
-      const otpResult = await OTPService.verifyOTP(email, otp);
+      // Verify Magic Link
+      const magicLinkResult = await MagicLinkService.verifyMagicLink(token);
 
-      if (!otpResult.success) {
+      if (!magicLinkResult.success) {
         return res.status(400).json({
           success: false,
-          error: 'Invalid verification code'
+          error: 'Invalid or expired verification link'
         });
       }
 
-      // Create verified user account
-      const result = await AuthService.registerUser({ 
-        name, 
-        email: otpResult.email, 
-        password,
-        isVerified: true 
-      });
+      const { email, type, userData } = magicLinkResult;
 
-      // Set JWT tokens in httpOnly cookies
-      res.cookie('accessToken', result.accessToken, getAccessTokenOptions());
-      res.cookie('refreshToken', result.refreshToken, getRefreshTokenOptions());
+      if (type === 'signup') {
+        // Create verified user account using stored data
+        const result = await AuthService.registerUser({ 
+          name: userData.name, 
+          email: email, 
+          password: userData.password, // Already hashed in MagicLinkService
+          isVerified: true,
+          isPasswordHashed: true // Flag to skip re-hashing
+        });
 
-      res.status(201).json({
-        success: true,
-        message: 'Account created successfully! Welcome to Bonds.',
-        user: result.user,
-        // Include token for mobile fallback (when cookies don't work)
-        token: result.accessToken
-      });
+        // Set JWT tokens in httpOnly cookies
+        res.cookie('accessToken', result.accessToken, getAccessTokenOptions());
+        res.cookie('refreshToken', result.refreshToken, getRefreshTokenOptions());
+
+        res.status(201).json({
+          success: true,
+          message: 'Account created successfully! Welcome to BONDS.',
+          user: result.user,
+          // Include token for mobile fallback (when cookies don't work)
+          token: result.accessToken
+        });
+      } else if (type === 'login') {
+        // Handle magic link login
+        const result = await AuthService.loginUserByEmail(email);
+
+        // Set JWT tokens in httpOnly cookies
+        res.cookie('accessToken', result.accessToken, getAccessTokenOptions());
+        res.cookie('refreshToken', result.refreshToken, getRefreshTokenOptions());
+
+        res.status(200).json({
+          success: true,
+          message: 'Login successful! Welcome back to BONDS.',
+          user: result.user,
+          token: result.accessToken
+        });
+      } else {
+        return res.status(400).json({
+          success: false,
+          error: 'Invalid magic link type'
+        });
+      }
 
     } catch (error) {
       next(error);
     }
   }
 
-  // Resend OTP
-  async resendOTP(req, res, next) {
+  // Magic Link Login (passwordless)
+  async magicLinkLogin(req, res, next) {
     try {
-      const { email, name } = req.body;
+      const { email } = req.body;
 
       if (!email) {
         return res.status(400).json({
@@ -117,7 +151,30 @@ class AuthController {
         });
       }
 
-      const result = await OTPService.resendOTP(email, name || 'Friend');
+      // Validate email format
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        return res.status(400).json({
+          success: false,
+          error: 'Please provide a valid email address'
+        });
+      }
+
+      // Check if user exists
+      const existingUser = await AuthService.checkUserExists(email);
+      if (!existingUser) {
+        return res.status(404).json({
+          success: false,
+          error: 'No account found with this email address'
+        });
+      }
+
+      // Get client info for security
+      const ipAddress = req.ip || req.connection.remoteAddress;
+      const userAgent = req.get('User-Agent');
+
+      // Generate and send login magic link
+      const result = await MagicLinkService.generateAndSendLoginLink(email, ipAddress, userAgent);
 
       res.status(200).json({
         success: true,
@@ -186,7 +243,7 @@ class AuthController {
     }
   }
 
-  // Step 1: Forgot Password - Send OTP
+  // Step 1: Forgot Password - Send Magic Link
   async forgotPassword(req, res, next) {
     try {
       const { email } = req.body;
@@ -217,8 +274,12 @@ class AuthController {
         });
       }
 
-      // Generate and send password reset OTP
-      const result = await OTPService.generateAndSendPasswordResetOTP(email, existingUser.name);
+      // Get client info for security
+      const ipAddress = req.ip || req.connection.remoteAddress;
+      const userAgent = req.get('User-Agent');
+
+      // Generate and send password reset magic link
+      const result = await MagicLinkService.generateAndSendPasswordResetLink(email, ipAddress, userAgent);
 
       res.status(200).json({
         success: true,
@@ -234,16 +295,50 @@ class AuthController {
 
 
 
-  // Step 2: Reset Password with OTP
-  async resetPassword(req, res, next) {
+  // Step 2: Verify Password Reset Magic Link
+  async verifyPasswordResetLink(req, res, next) {
     try {
-      const { email, otp, newPassword } = req.body;
+      const { token } = req.body;
 
       // Validate required fields
-      if (!email || !otp || !newPassword) {
+      if (!token) {
         return res.status(400).json({
           success: false,
-          error: 'Email, OTP, and new password are required'
+          error: 'Reset token is required'
+        });
+      }
+
+      // Verify Magic Link
+      const magicLinkResult = await MagicLinkService.verifyMagicLink(token);
+
+      if (!magicLinkResult.success || magicLinkResult.type !== 'password_reset') {
+        return res.status(400).json({
+          success: false,
+          error: 'Invalid or expired password reset link'
+        });
+      }
+
+      res.status(200).json({
+        success: true,
+        message: 'Password reset link verified successfully',
+        email: magicLinkResult.email
+      });
+
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  // Step 3: Reset Password with verified token
+  async resetPassword(req, res, next) {
+    try {
+      const { token, newPassword } = req.body;
+
+      // Validate required fields
+      if (!token || !newPassword) {
+        return res.status(400).json({
+          success: false,
+          error: 'Reset token and new password are required'
         });
       }
 
@@ -255,18 +350,18 @@ class AuthController {
         });
       }
 
-      // Verify OTP one more time
-      const otpResult = await OTPService.verifyOTP(email, otp);
+      // Verify Magic Link one more time
+      const magicLinkResult = await MagicLinkService.verifyMagicLink(token);
 
-      if (!otpResult.success) {
+      if (!magicLinkResult.success || magicLinkResult.type !== 'password_reset') {
         return res.status(400).json({
           success: false,
-          error: 'Invalid or expired reset code'
+          error: 'Invalid or expired password reset link'
         });
       }
 
       // Update user password
-      const result = await AuthService.resetUserPassword(otpResult.email, newPassword);
+      await AuthService.resetUserPassword(magicLinkResult.email, newPassword);
 
       res.status(200).json({
         success: true,

@@ -11,7 +11,7 @@ export const authService = {
     }
   },
 
-  // Login user
+  // Traditional login with email/password
   async login(credentials) {
     try {
       const response = await api.post('/auth/login', credentials);
@@ -21,7 +21,20 @@ export const authService = {
     }
   },
 
-  // Step 1: Initial signup (sends OTP)
+  // Magic Link login (passwordless)
+  async magicLinkLogin(email) {
+    try {
+      console.log('Making API call to magic link login:', { email });
+      const response = await api.post('/auth/magic-login', { email });
+      console.log('Magic link login API response:', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('Magic link login API error:', error);
+      throw error;
+    }
+  },
+
+  // Step 1: Initial signup (sends Magic Link)
   async signup(signupData) {
     try {
       console.log('Making API call to signup:', signupData);
@@ -34,28 +47,15 @@ export const authService = {
     }
   },
 
-  // Step 2: Verify OTP and create account
-  async verifyOTP(verificationData) {
+  // Step 2: Verify Magic Link and create account
+  async verifyMagicLink(token) {
     try {
-      console.log('Making API call to verify OTP:', verificationData);
-      const response = await api.post('/auth/verify-otp', verificationData);
-      console.log('Verify OTP API response:', response.data);
+      console.log('Making API call to verify magic link:', { token });
+      const response = await api.post('/auth/verify-magic-link', { token });
+      console.log('Verify magic link API response:', response.data);
       return response.data;
     } catch (error) {
-      console.error('Verify OTP API error:', error);
-      throw error;
-    }
-  },
-
-  // Resend OTP
-  async resendOTP(resendData) {
-    try {
-      console.log('Making API call to resend OTP:', resendData);
-      const response = await api.post('/auth/resend-otp', resendData);
-      console.log('Resend OTP API response:', response.data);
-      return response.data;
-    } catch (error) {
-      console.error('Resend OTP API error:', error);
+      console.error('Verify magic link API error:', error);
       throw error;
     }
   },
@@ -70,7 +70,7 @@ export const authService = {
     }
   },
 
-  // Forgot password - Step 1: Send reset OTP
+  // Forgot password - Step 1: Send reset Magic Link
   async forgotPassword(email) {
     try {
       console.log('Making API call to forgot password:', { email });
@@ -83,11 +83,24 @@ export const authService = {
     }
   },
 
-  // Forgot password - Step 2: Reset password
-  async resetPassword(email, otp, newPassword) {
+  // Forgot password - Step 2: Verify reset link
+  async verifyResetLink(token) {
     try {
-      console.log('Making API call to reset password:', { email, otp });
-      const response = await api.post('/auth/reset-password', { email, otp, newPassword });
+      console.log('Making API call to verify reset link:', { token });
+      const response = await api.post('/auth/verify-reset-link', { token });
+      console.log('Verify reset link API response:', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('Verify reset link API error:', error);
+      throw error;
+    }
+  },
+
+  // Forgot password - Step 3: Reset password with verified token
+  async resetPassword(token, newPassword) {
+    try {
+      console.log('Making API call to reset password:', { token });
+      const response = await api.post('/auth/reset-password', { token, newPassword });
       console.log('Reset password API response:', response.data);
       return response.data;
     } catch (error) {

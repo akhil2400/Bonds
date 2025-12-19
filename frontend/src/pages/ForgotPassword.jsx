@@ -1,16 +1,18 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { authService } from '../services/authService';
 import './Login.css';
 
 const ForgotPassword = () => {
-  const navigate = useNavigate();
-  const [step, setStep] = useState(1); // 1: Email, 2: OTP + New Password
+  const [step, setStep] = useState(1); // 1: Email, 2: Magic Link Sent
   const [formData, setFormData] = useState({
-    email: '',
-    otp: '',
-    newPassword: '',
-    confirmPassword: ''
+    email: ''
+  });
+  const [magicLinkData, setMagicLinkData] = useState({
+    isResending: false,
+    canResend: true,
+    resendTimer: 0,
+    expiresAt: null
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
@@ -27,8 +29,22 @@ const ForgotPassword = () => {
     if (error) setError('');
   };
 
-  // Step 1: Send reset OTP
-  const handleSendOTP = async (e) => {
+  // Start resend timer
+  const startResendTimer = () => {
+    setMagicLinkData(prev => ({ ...prev, canResend: false, resendTimer: 60 }));
+    const timer = setInterval(() => {
+      setMagicLinkData(prev => {
+        if (prev.resendTimer <= 1) {
+          clearInterval(timer);
+          return { ...prev, canResend: true, resendTimer: 0 };
+        }
+        return { ...prev, resendTimer: prev.resendTimer - 1 };
+      });
+    }, 1000);
+  };
+
+  // Step 1: Send reset Magic Link
+  const handleSendMagicLink = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
     setError('');
@@ -36,50 +52,44 @@ const ForgotPassword = () => {
     try {
       const response = await authService.forgotPassword(formData.email);
       setMaskedEmail(response.email);
-      setSuccess('Reset code sent to your email!');
+      setMagicLinkData({
+        isResending: false,
+        canResend: true,
+        resendTimer: 0,
+        expiresAt: response.expiresAt
+      });
+      setSuccess('Reset link sent to your email!');
       setStep(2);
+      startResendTimer();
     } catch (err) {
-      setError(err.message || 'Failed to send reset code');
+      setError(err.message || 'Failed to send reset link');
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  // Step 2: Reset password with OTP
-  const handleResetPassword = async (e) => {
-    e.preventDefault();
-    setIsSubmitting(true);
+  // Resend Magic Link
+  const handleResendMagicLink = async () => {
+    setMagicLinkData(prev => ({ ...prev, isResending: true }));
     setError('');
 
-    // Validate passwords match
-    if (formData.newPassword !== formData.confirmPassword) {
-      setError('Passwords do not match');
-      setIsSubmitting(false);
-      return;
-    }
-
-    // Validate password strength
-    if (formData.newPassword.length < 6) {
-      setError('Password must be at least 6 characters long');
-      setIsSubmitting(false);
-      return;
-    }
-
     try {
-      await authService.resetPassword(formData.email, formData.otp, formData.newPassword);
-      setSuccess('Password reset successfully! Redirecting to login...');
-      setTimeout(() => {
-        navigate('/login');
-      }, 2000);
+      const response = await authService.forgotPassword(formData.email);
+      setMagicLinkData(prev => ({
+        ...prev,
+        isResending: false,
+        expiresAt: response.expiresAt
+      }));
+      setSuccess('Reset link sent again!');
+      startResendTimer();
     } catch (err) {
-      setError(err.message || 'Failed to reset password');
-    } finally {
-      setIsSubmitting(false);
+      setError(err.message || 'Failed to resend reset link');
+      setMagicLinkData(prev => ({ ...prev, isResending: false }));
     }
   };
 
   const renderStep1 = () => (
-    <form className="login-form" onSubmit={handleSendOTP}>
+    <form className="login-form" onSubmit={handleSendMagicLink}>
       <div className="form-group">
         <label htmlFor="email" className="form-label">
           Email address
@@ -104,108 +114,87 @@ const ForgotPassword = () => {
         {isSubmitting ? (
           <div className="loading-text">
             <div className="spinner small-spinner"></div>
-            Sending code...
+            Sending reset link...
           </div>
         ) : (
-          'Send Reset Code'
+          'Send Reset Link'
         )}
       </button>
     </form>
   );
 
   const renderStep2 = () => (
-    <form className="login-form" onSubmit={handleResetPassword}>
-      <div className="form-group">
-        <label htmlFor="otp" className="form-label">
-          Verification Code
-        </label>
-        <input
-          id="otp"
-          name="otp"
-          type="text"
-          required
-          maxLength="6"
-          value={formData.otp}
-          onChange={handleChange}
-          className="form-input"
-          placeholder="Enter 6-digit code"
-        />
-        <small className="form-help">
-          Code sent to {maskedEmail}
-        </small>
+    <div className="login-form">
+      <div className="magic-link-info">
+        <div className="magic-link-icon">
+          🔑
+        </div>
+        <h3>Check your email!</h3>
+        <p>
+          We've sent a password reset link to:
+        </p>
+        <strong className="email-display">
+          {maskedEmail}
+        </strong>
+        <p className="magic-link-instructions">
+          Click the link in your email to reset your password. 
+          The link will expire in 10 minutes for your security.
+        </p>
       </div>
 
-      <div className="form-group">
-        <label htmlFor="newPassword" className="form-label">
-          New Password
-        </label>
-        <input
-          id="newPassword"
-          name="newPassword"
-          type="password"
-          required
-          value={formData.newPassword}
-          onChange={handleChange}
-          className="form-input"
-          placeholder="Enter new password"
-        />
-      </div>
-
-      <div className="form-group">
-        <label htmlFor="confirmPassword" className="form-label">
-          Confirm Password
-        </label>
-        <input
-          id="confirmPassword"
-          name="confirmPassword"
-          type="password"
-          required
-          value={formData.confirmPassword}
-          onChange={handleChange}
-          className="form-input"
-          placeholder="Confirm new password"
-        />
-      </div>
-
-      <button
-        type="submit"
-        disabled={isSubmitting}
-        className="btn btn-primary login-submit-btn"
-      >
-        {isSubmitting ? (
-          <div className="loading-text">
-            <div className="spinner small-spinner"></div>
-            Resetting password...
-          </div>
-        ) : (
-          'Reset Password'
-        )}
-      </button>
-
-      <div className="login-footer">
+      <div className="magic-link-actions">
+        <button
+          type="button"
+          onClick={handleResendMagicLink}
+          disabled={!magicLinkData.canResend || magicLinkData.isResending}
+          className="btn btn-secondary"
+        >
+          {magicLinkData.isResending ? (
+            <div className="loading-text">
+              <div className="spinner small-spinner"></div>
+              Sending...
+            </div>
+          ) : magicLinkData.canResend ? (
+            'Resend Link'
+          ) : (
+            `Resend in ${magicLinkData.resendTimer}s`
+          )}
+        </button>
+        
         <button
           type="button"
           onClick={() => setStep(1)}
-          className="btn-link"
+          className="btn btn-link"
         >
-          ← Back to email
+          Change Email
         </button>
       </div>
-    </form>
+
+      <div className="magic-link-help">
+        <p>
+          <strong>Didn't receive the email?</strong>
+        </p>
+        <ul>
+          <li>Check your spam/junk folder</li>
+          <li>Make sure you entered the correct email address</li>
+          <li>Wait a few minutes and try resending</li>
+        </ul>
+      </div>
+    </div>
   );
 
   const getStepTitle = () => {
     switch (step) {
       case 1: return 'Reset your password';
-      case 2: return 'Enter code and new password';
+      case 2: return 'Reset link sent!';
       default: return 'Reset Password';
     }
   };
 
   const getStepDescription = () => {
     switch (step) {
-      case 1: return 'Enter your email to receive a reset code';
-      case 2: return 'Enter the code from your email and choose a new password';
+      case 1: return 'Enter your email to receive a reset link';
+      case 2: return 'Check your email to reset your password';
       default: return '';
     }
   };

@@ -16,7 +16,7 @@ class AuthService {
   }
 
   async registerUser(userData) {
-    const { name, email, password, isVerified = false } = userData;
+    const { name, email, password, isVerified = false, isPasswordHashed = false } = userData;
 
     // Check if user already exists by email
     if (email) {
@@ -26,10 +26,8 @@ class AuthService {
       }
     }
 
-
-
-    // Hash password
-    const hashedPassword = await this.hashPassword(password);
+    // Hash password if not already hashed (for magic link flow, password is pre-hashed)
+    const hashedPassword = isPasswordHashed ? password : await this.hashPassword(password);
 
     // Determine user role and trusted status based on email
     const { TRUSTED_MEMBER_EMAILS } = require('../middlewares/authorization');
@@ -78,6 +76,35 @@ class AuthService {
     const isValidPassword = await this.validatePassword(password, user.password);
     if (!isValidPassword) {
       throw new CustomError('Invalid credentials', 401);
+    }
+
+    // Generate tokens
+    const { accessToken, refreshToken } = this.generateTokens(user._id);
+
+    return {
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        isTrustedMember: user.isTrustedMember
+      },
+      accessToken,
+      refreshToken
+    };
+  }
+
+  // Login user by email only (for magic link authentication)
+  async loginUserByEmail(email) {
+    // Find user
+    const user = await AuthRepository.findByEmail(email);
+    if (!user) {
+      throw new CustomError('User not found', 404);
+    }
+
+    // Check if user is active
+    if (!user.isActive) {
+      throw new CustomError('Account is deactivated', 401);
     }
 
     // Generate tokens

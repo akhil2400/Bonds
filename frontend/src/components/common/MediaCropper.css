@@ -177,6 +177,28 @@
   cursor: not-allowed;
 }
 
+.skip-all-btn {
+  padding: 0.625rem 1.25rem;
+  border: 1px solid #f59e0b;
+  background: #fef3c7;
+  color: #92400e;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.skip-all-btn:hover:not(:disabled) {
+  background: #fde68a;
+  border-color: #d97706;
+}
+
+.skip-all-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .processing {
   display: flex;
   align-items: center;

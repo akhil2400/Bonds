@@ -9,11 +9,14 @@ const CustomError = require('../errors/CustomError');
 
 // List of trusted member emails (the 4 friends)
 const TRUSTED_MEMBER_EMAILS = [
-  process.env.TRUSTED_EMAIL_1 || 'user1@example.com',
-  process.env.TRUSTED_EMAIL_2 || 'user2@example.com', 
-  process.env.TRUSTED_EMAIL_3 || 'user3@example.com',
-  process.env.TRUSTED_EMAIL_4 || 'user4@example.com'
+  'adidev140403@gmail.com',
+  'akhilathul56@gmail.com',
+  'athithyatkd@gmail.com',
+  'bhosaleasleshiya990@gmail.com'
 ];
+
+// Debug log to verify emails are loaded correctly
+console.log('🔍 Trusted member emails configured:', TRUSTED_MEMBER_EMAILS);
 
 /**
  * Middleware to allow only trusted members (admin/member roles) to perform mutations

@@ -4,6 +4,7 @@ import PermissionGate from '../components/common/PermissionGate';
 import ItemActions from '../components/common/ItemActions';
 import MediaCropper from '../components/common/MediaCropper';
 import { usePermissions } from '../context/PermissionContext';
+import { debugImageFile, validateImageFile, validateVideoFile, createSafeObjectURL, revokeSafeObjectURL } from '../utils/imageUtils';
 import './Memories.css';
 
 const Memories = () => {
@@ -30,6 +31,16 @@ const Memories = () => {
   useEffect(() => {
     fetchMemories();
   }, []);
+
+  // Cleanup URLs when component unmounts or memory changes
+  useEffect(() => {
+    return () => {
+      // Cleanup any object URLs to prevent memory leaks
+      newMemory.media.forEach(item => {
+        revokeSafeObjectURL(item.url);
+      });
+    };
+  }, [newMemory.media]);
 
   const fetchMemories = async () => {
     try {
@@ -108,57 +119,137 @@ const Memories = () => {
     
     if (files.length === 0) return;
     
-    // Start cropping process for images, or add videos directly
-    const imageFiles = files.filter(file => file.type.startsWith('image/'));
-    const videoFiles = files.filter(file => file.type.startsWith('video/'));
+    console.log('Files selected:', files.length);
     
-    // Add videos directly (no cropping needed)
-    const videoMedia = videoFiles.map(file => ({
-      url: URL.createObjectURL(file),
-      file: file,
-      type: 'video'
-    }));
-    
-    if (imageFiles.length > 0) {
-      // Start cropping process for images
-      setPendingFiles(imageFiles);
-      setCurrentCropIndex(0);
-      setCropperFile(imageFiles[0]);
+    try {
+      // Validate and separate files
+      const imageFiles = [];
+      const videoFiles = [];
       
-      // Add videos to current media
-      if (videoFiles.length > 0) {
+      files.forEach(file => {
+        debugImageFile(file, 'Selected file');
+        
+        if (file.type.startsWith('image/')) {
+          validateImageFile(file);
+          imageFiles.push(file);
+        } else if (file.type.startsWith('video/')) {
+          validateVideoFile(file);
+          videoFiles.push(file);
+        } else {
+          console.warn('Unsupported file type:', file.type);
+        }
+      });
+      
+      console.log('Valid files - Images:', imageFiles.length, 'Videos:', videoFiles.length);
+      
+      // Add videos directly (no cropping needed)
+      const videoMedia = videoFiles.map(file => ({
+        url: createSafeObjectURL(file),
+        file: file,
+        type: 'video',
+        name: file.name
+      }));
+      
+      if (imageFiles.length > 0) {
+        // Start cropping process for images
+        setPendingFiles(imageFiles);
+        setCurrentCropIndex(0);
+        setCropperFile(imageFiles[0]);
+        
+        // Add videos to current media
+        if (videoFiles.length > 0) {
+          setNewMemory(prev => ({
+            ...prev,
+            selectedFiles: [...prev.selectedFiles, ...videoFiles],
+            media: [...prev.media, ...videoMedia]
+          }));
+        }
+      } else {
+        // Only videos, add them directly
         setNewMemory(prev => ({
           ...prev,
           selectedFiles: [...prev.selectedFiles, ...videoFiles],
           media: [...prev.media, ...videoMedia]
         }));
       }
-    } else {
-      // Only videos, add them directly
-      setNewMemory(prev => ({
-        ...prev,
-        selectedFiles: [...prev.selectedFiles, ...videoFiles],
-        media: [...prev.media, ...videoMedia]
-      }));
+    } catch (error) {
+      console.error('File validation error:', error);
+      setError(error.message);
     }
     
     // Clear the input
     e.target.value = '';
   };
 
-  const handleCropComplete = (croppedFile) => {
-    // Add the cropped file to the memory
-    const newMedia = {
-      url: URL.createObjectURL(croppedFile),
-      file: croppedFile,
-      type: 'image'
-    };
+  // Add function to skip cropping for all images
+  const handleSkipAllCropping = () => {
+    console.log('Skipping cropping for all pending files');
+    
+    const allImageMedia = pendingFiles.map(file => ({
+      url: createSafeObjectURL(file),
+      file: file,
+      type: 'image',
+      name: file.name
+    }));
     
     setNewMemory(prev => ({
       ...prev,
-      selectedFiles: [...prev.selectedFiles, croppedFile],
-      media: [...prev.media, newMedia]
+      selectedFiles: [...prev.selectedFiles, ...pendingFiles],
+      media: [...prev.media, ...allImageMedia]
     }));
+    
+    // Close cropper
+    setCropperFile(null);
+    setPendingFiles([]);
+    setCurrentCropIndex(0);
+  };
+
+  const handleCropComplete = (croppedFile) => {
+    console.log('🎯 Crop completed for file:', {
+      name: croppedFile.name,
+      size: croppedFile.size,
+      type: croppedFile.type,
+      lastModified: croppedFile.lastModified
+    });
+    
+    // Create object URL for preview
+    const previewUrl = createSafeObjectURL(croppedFile);
+    console.log('🔗 Created preview URL:', previewUrl);
+    
+    if (!previewUrl) {
+      console.error('❌ Failed to create preview URL for cropped file');
+      // Fallback: try to use original file
+      const originalFile = pendingFiles[currentCropIndex];
+      const fallbackUrl = createSafeObjectURL(originalFile);
+      const newMedia = {
+        url: fallbackUrl,
+        file: originalFile,
+        type: 'image',
+        name: originalFile.name
+      };
+      
+      setNewMemory(prev => ({
+        ...prev,
+        selectedFiles: [...prev.selectedFiles, originalFile],
+        media: [...prev.media, newMedia]
+      }));
+    } else {
+      // Add the cropped file to the memory
+      const newMedia = {
+        url: previewUrl,
+        file: croppedFile,
+        type: 'image',
+        name: croppedFile.name
+      };
+      
+      console.log('✅ Adding cropped media to preview:', newMedia);
+      
+      setNewMemory(prev => ({
+        ...prev,
+        selectedFiles: [...prev.selectedFiles, croppedFile],
+        media: [...prev.media, newMedia]
+      }));
+    }
     
     // Move to next file or close cropper
     const nextIndex = currentCropIndex + 1;
@@ -174,7 +265,27 @@ const Memories = () => {
   };
 
   const handleCropCancel = () => {
-    // Skip current file and move to next, or close cropper
+    console.log('Crop cancelled/skipped for current file');
+    
+    // If skipping, add the original file (always add when skipping individual files)
+    const originalFile = pendingFiles[currentCropIndex];
+    const previewUrl = createSafeObjectURL(originalFile);
+    console.log('Created preview URL for skipped file:', previewUrl);
+    
+    const newMedia = {
+      url: previewUrl,
+      file: originalFile,
+      type: 'image',
+      name: originalFile.name
+    };
+    
+    setNewMemory(prev => ({
+      ...prev,
+      selectedFiles: [...prev.selectedFiles, originalFile],
+      media: [...prev.media, newMedia]
+    }));
+    
+    // Move to next file or close cropper
     const nextIndex = currentCropIndex + 1;
     if (nextIndex < pendingFiles.length) {
       setCurrentCropIndex(nextIndex);
@@ -427,19 +538,114 @@ const Memories = () => {
               {newMemory.media.length > 0 && (
                 <div className="media-preview">
                   {newMemory.media.map((item, index) => (
-                    <div key={index} className="preview-item">
+                    <div key={index} className="preview-item" style={{ position: 'relative' }}>
                       {item.type === 'video' ? (
-                        <video src={item.url} controls preload="metadata" />
+                        <video 
+                          src={item.url} 
+                          controls 
+                          preload="metadata"
+                          onError={(e) => {
+                            console.error('Video preview error:', e);
+                          }}
+                        />
                       ) : (
-                        <img src={item.url} alt={`Preview ${index + 1}`} />
+                        <>
+                          <img 
+                            src={item.url} 
+                            alt={`Preview ${index + 1}`}
+                            style={{
+                              width: '100%',
+                              height: '100%',
+                              objectFit: 'cover',
+                              backgroundColor: '#f3f4f6'
+                            }}
+                            onLoad={(e) => {
+                              console.log('✅ Image preview loaded successfully:', {
+                                index: index,
+                                url: item.url,
+                                fileName: item.name,
+                                naturalWidth: e.target.naturalWidth,
+                                naturalHeight: e.target.naturalHeight,
+                                displayWidth: e.target.width,
+                                displayHeight: e.target.height
+                              });
+                              // Hide loading indicator if any
+                              const loadingDiv = e.target.parentElement.querySelector('.loading-indicator');
+                              if (loadingDiv) loadingDiv.style.display = 'none';
+                            }}
+                            onError={(e) => {
+                              console.error('❌ Image preview error:', {
+                                index: index,
+                                error: e.type,
+                                url: item.url,
+                                fileName: item.name,
+                                fileSize: item.file?.size,
+                                fileType: item.file?.type
+                              });
+                              
+                              // Hide loading indicator
+                              const loadingDiv = e.target.parentElement.querySelector('.loading-indicator');
+                              if (loadingDiv) loadingDiv.style.display = 'none';
+                              
+                              // Show a placeholder or try to recreate the URL
+                              if (item.file && item.url.startsWith('blob:')) {
+                                console.log('🔄 Attempting to recreate blob URL...');
+                                const newUrl = createSafeObjectURL(item.file);
+                                if (newUrl) {
+                                  console.log('🔗 New URL created:', newUrl);
+                                  e.target.src = newUrl;
+                                  // Update the media item with new URL
+                                  setNewMemory(prev => ({
+                                    ...prev,
+                                    media: prev.media.map((mediaItem, mediaIndex) => 
+                                      mediaIndex === index ? { ...mediaItem, url: newUrl } : mediaItem
+                                    )
+                                  }));
+                                } else {
+                                  console.error('❌ Failed to recreate URL');
+                                  // Show error placeholder
+                                  e.target.style.backgroundColor = '#fee2e2';
+                                  e.target.style.border = '2px dashed #ef4444';
+                                  e.target.style.display = 'flex';
+                                  e.target.style.alignItems = 'center';
+                                  e.target.style.justifyContent = 'center';
+                                  e.target.alt = '❌ Preview Error';
+                                }
+                              }
+                            }}
+                          />
+                          <div 
+                            className="loading-indicator"
+                            style={{
+                              position: 'absolute',
+                              top: '50%',
+                              left: '50%',
+                              transform: 'translate(-50%, -50%)',
+                              background: 'rgba(0,0,0,0.7)',
+                              color: 'white',
+                              padding: '8px',
+                              borderRadius: '4px',
+                              fontSize: '12px',
+                              pointerEvents: 'none'
+                            }}
+                          >
+                            Loading...
+                          </div>
+                        </>
                       )}
                       <div className="media-type-badge">
                         {item.type === 'video' ? '🎥' : '📷'}
+                      </div>
+                      <div className="media-name">
+                        {item.name || `${item.type} ${index + 1}`}
                       </div>
                       <button
                         type="button"
                         className="remove-media"
                         onClick={() => {
+                          // Cleanup URL before removing
+                          revokeSafeObjectURL(item.url);
+                          
                           const newFiles = [...newMemory.selectedFiles];
                           const newMedia = [...newMemory.media];
                           newFiles.splice(index, 1);
@@ -635,6 +841,7 @@ const Memories = () => {
           file={cropperFile}
           onCropComplete={handleCropComplete}
           onCancel={handleCropCancel}
+          onSkipAll={handleSkipAllCropping}
           aspectRatio={null} // Free crop, or set to 1 for square, 16/9 for widescreen, etc.
           progress={pendingFiles.length > 1 ? {
             current: currentCropIndex + 1,

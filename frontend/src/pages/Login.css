@@ -387,3 +387,187 @@
   font-size: var(--font-size-xs);
   color: var(--color-text-muted);
 }
+/* Magic Link Styles */
+.magic-link-info {
+  text-align: center;
+  padding: 2rem 0;
+}
+
+.magic-link-icon {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+.magic-link-info h3 {
+  font-family: 'Louisville Script W07 Bold It', 'Louisville Script Bold', cursive;
+  font-size: 1.8rem;
+  color: #1b1b1e;
+  margin-bottom: 1rem;
+}
+
+.magic-link-info p {
+  color: #6d676e;
+  margin: 0.5rem 0;
+  line-height: 1.6;
+}
+
+.email-display {
+  display: block;
+  color: #faa916;
+  font-size: 1.1rem;
+  margin: 1rem 0;
+  word-break: break-all;
+}
+
+.magic-link-instructions {
+  font-size: 0.95rem;
+  max-width: 400px;
+  margin: 1.5rem auto;
+}
+
+.magic-link-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin: 2rem 0;
+}
+
+.magic-link-help {
+  background: #f9fafb;
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+  margin-top: 2rem;
+  text-align: left;
+}
+
+.magic-link-help p {
+  margin: 0 0 0.5rem 0;
+  color: #1b1b1e;
+}
+
+.magic-link-help ul {
+  margin: 0.5rem 0 0 1.5rem;
+  padding: 0;
+  color: #6d676e;
+}
+
+.magic-link-help li {
+  margin: 0.25rem 0;
+  font-size: 0.9rem;
+}
+
+/* Verification Status Styles */
+.verification-status {
+  text-align: center;
+  padding: 3rem 2rem;
+}
+
+.verification-icon {
+  font-size: 5rem;
+  margin-bottom: 1.5rem;
+}
+
+.verification-status h3 {
+  font-family: 'Louisville Script W07 Bold It', 'Louisville Script Bold', cursive;
+  font-size: 2rem;
+  color: #1b1b1e;
+  margin-bottom: 1rem;
+}
+
+.verification-status p {
+  color: #6d676e;
+  margin: 0.5rem 0;
+  line-height: 1.6;
+}
+
+.verification-status.verifying .verification-icon {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.verification-status.success {
+  color: #059669;
+}
+
+.verification-status.error {
+  color: #dc2626;
+}
+
+.verification-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 2rem;
+  max-width: 300px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.reset-info {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.reset-info p {
+  color: #6d676e;
+  margin: 0.5rem 0;
+}
+
+/* Button Styles */
+.btn-secondary {
+  background: transparent;
+  color: #faa916;
+  border: 2px solid #faa916;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: 'Louisville Script W07 Bold It', 'Louisville Script Bold', cursive;
+  font-size: 1.1rem;
+  text-decoration: none;
+  display: inline-block;
+  text-align: center;
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: #faa916;
+  color: #fbfffe;
+}
+
+.btn-secondary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-link {
+  background: none;
+  border: none;
+  color: #6d676e;
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.btn-link:hover {
+  color: #faa916;
+}
