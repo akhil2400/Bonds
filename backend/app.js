@@ -64,21 +64,26 @@ app.get('/api/test', (req, res) => {
 // Email service test endpoint
 app.get('/api/test-email', async (req, res) => {
   try {
-    const MailerService = require('./utils/mailer');
+    const EmailService = require('./services/EmailService');
+    const MagicLinkService = require('./services/MagicLinkService');
     
     // Check environment variables
     const emailConfig = {
-      EMAIL_USER: process.env.EMAIL_USER ? 'configured' : 'missing',
-      EMAIL_PASS: process.env.EMAIL_PASS ? 'configured' : 'missing'
+      RESEND_API_KEY: process.env.RESEND_API_KEY ? 'configured' : 'missing',
+      CLIENT_URL: process.env.CLIENT_URL || 'not_configured'
     };
     
     // Try to initialize email service
     let emailStatus = 'not_initialized';
     let emailError = null;
+    let magicLinkStats = null;
     
     try {
-      await MailerService.initialize();
-      emailStatus = 'initialized';
+      const isReady = await EmailService.verifyConnection();
+      emailStatus = isReady ? 'ready' : 'failed';
+      
+      // Get Magic Link statistics
+      magicLinkStats = await MagicLinkService.getMagicLinkStats();
     } catch (error) {
       emailStatus = 'failed';
       emailError = error.message;
@@ -86,10 +91,11 @@ app.get('/api/test-email', async (req, res) => {
     
     res.json({
       success: true,
-      message: 'Email service test',
+      message: 'Magic Link email service test',
       config: emailConfig,
       status: emailStatus,
       error: emailError,
+      magicLinkStats,
       timestamp: new Date().toISOString()
     });
   } catch (error) {

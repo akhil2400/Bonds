@@ -31,7 +31,7 @@ A beautiful, private space to treasure memories, share moments, and celebrate th
 - **Node.js** with Express
 - **MongoDB** with Mongoose
 - **JWT Authentication** with secure cookies
-- **Nodemailer** for email verification
+- **Resend** for Magic Link email delivery
 - **bcryptjs** for password hashing
 
 ## 📦 Installation

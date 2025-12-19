@@ -27,8 +27,8 @@ if (process.env.JWT_SECRET.length < 32) {
 
 const app = require('./app');
 const connectDB = require('./config/db');
-const MailerService = require('./utils/mailer');
-const OTPService = require('./services/OTPService');
+const EmailService = require('./services/EmailService');
+const MagicLinkService = require('./services/MagicLinkService');
 
 const PORT = process.env.PORT || 5000;
 
@@ -60,7 +60,7 @@ const startServer = async () => {
     console.log('📧 Step 3: Email Service Initialization');
     try {
       // Don't block server startup for email service
-      const emailVerification = MailerService.verifyConnection();
+      const emailVerification = EmailService.verifyConnection();
       const emailTimeout = new Promise((resolve) => 
         setTimeout(() => resolve(false), 5000)
       );
@@ -68,14 +68,14 @@ const startServer = async () => {
       const emailReady = await Promise.race([emailVerification, emailTimeout]);
       
       if (emailReady) {
-        console.log('✅ Nodemailer service ready');
+        console.log('✅ Resend email service ready');
       } else {
         console.log('⚠️  Email service initialization timeout - will retry on first use');
-        console.log('💡 This is normal on Render free tier - emails will work when needed');
+        console.log('💡 Make sure RESEND_API_KEY is configured in .env');
       }
     } catch (error) {
       console.log('⚠️  Email service will be initialized on first use');
-      console.log('💡 Make sure EMAIL_USER and EMAIL_PASS are configured in .env');
+      console.log('💡 Make sure RESEND_API_KEY is configured in .env');
     }
 
     // Step 4: Schedule background tasks
@@ -83,9 +83,9 @@ const startServer = async () => {
     console.log('⏰ Step 4: Background Tasks');
     setInterval(async () => {
       try {
-        await OTPService.cleanExpiredOTPs();
+        await MagicLinkService.cleanExpiredLinks();
       } catch (error) {
-        console.error('⚠️  OTP cleanup failed:', error.message);
+        console.error('⚠️  Magic link cleanup failed:', error.message);
       }
     }, 60 * 60 * 1000); // Every hour
     

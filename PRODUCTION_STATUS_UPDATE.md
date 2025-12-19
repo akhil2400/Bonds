@@ -8,10 +8,10 @@
 - **Solution**: Updated CORS middleware to allow requests without origin
 - **Status**: ✅ **WORKING** - Both health and API endpoints accessible
 
-### 2. Email Service Timeout - IMPROVED ✅  
-- **Problem**: Nodemailer connection timeout blocking server startup
-- **Root Cause**: Gmail SMTP slow to connect on Render free tier
-- **Solution**: Added timeout handling and non-blocking initialization
+### 2. Email Service - UPGRADED ✅  
+- **Previous**: Nodemailer with Gmail SMTP (connection issues on serverless)
+- **Current**: Resend API with Magic Link authentication
+- **Benefits**: Serverless-compatible, faster, more reliable
 - **Status**: ✅ **WORKING** - Server starts successfully, email works on demand
 
 ## 🧪 PRODUCTION TESTING RESULTS
