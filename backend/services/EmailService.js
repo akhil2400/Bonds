@@ -5,7 +5,7 @@ class EmailService {
   constructor() {
     this.resend = null;
     this.initialized = false;
-    this.fromEmail = 'BONDS <noreply@bonds-app.com>'; // Update with your verified domain
+    this.fromEmail = 'BONDS <onboarding@resend.dev>'; // Using Resend's verified test domain
   }
 
   async initialize() {
@@ -45,27 +45,36 @@ class EmailService {
 
       const result = await this.resend.emails.send(emailData);
       
-      console.log('✅ Magic link email sent successfully:', result.id);
+      // Check if there's an error in the result
+      if (result.error) {
+        throw new Error(result.error.message || 'Email sending failed');
+      }
+      
+      console.log('✅ Magic link email sent successfully:', result.data?.id);
       console.log(`📧 Magic link sent to: ${email.replace(/(.{2}).*(@.*)/, '$1***$2')}`);
 
       return {
         success: true,
-        messageId: result.id,
+        messageId: result.data?.id,
         message: 'Magic link sent successfully'
       };
 
     } catch (error) {
       console.error('❌ Magic link email failed:', error.message);
       
-      // Log the magic link for development/testing if email fails
-      if (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'production') {
-        console.log('🔍 FALLBACK - Magic Link Details for Testing:');
-        console.log('📧 Email:', email.replace(/(.{2}).*(@.*)/, '$1***$2'));
-        console.log('🔗 Magic Link:', magicLink);
-        console.log('👤 User:', userName);
-        console.log('📝 Type:', type);
-        console.log('💡 Use this link if email delivery fails');
+      // Check if it's a domain verification issue
+      if (error.message.includes('verify a domain') || error.message.includes('testing emails')) {
+        console.log('⚠️ Domain verification required for production emails');
+        console.log('💡 For now, emails can only be sent to: bondforever44@gmail.com');
       }
+      
+      // Log the magic link for development/testing if email fails
+      console.log('🔍 FALLBACK - Magic Link Details for Testing:');
+      console.log('📧 Email:', email.replace(/(.{2}).*(@.*)/, '$1***$2'));
+      console.log('🔗 Magic Link:', magicLink);
+      console.log('👤 User:', userName);
+      console.log('📝 Type:', type);
+      console.log('💡 Use this link if email delivery fails');
       
       // Don't throw error - allow signup to continue
       return {
